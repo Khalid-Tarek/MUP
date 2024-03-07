@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from database_utils import data
 app = Flask(__name__, template_folder="templates")
 
 MUP_header = ["military_id", "name", "start_date", "end_date"]
@@ -11,6 +12,7 @@ MUP = [
 
 @app.route('/')
 def hello_world():
+    print(data)
     return render_template("index.html", MUP_header=MUP_header, MUP=MUP)
 
 if __name__ == "__main__":

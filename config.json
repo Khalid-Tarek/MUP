@@ -1,0 +1,9 @@
+{
+    "db2" : {
+        "database_username": "db2admin",
+        "database_password": "123",
+        "database_hostname": "localhost",
+        "database_port": "25000",
+        "database_name": "MUP_DB"
+    }
+}
