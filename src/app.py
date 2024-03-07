@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from database_utils import data
+from database_utils import get_ibm_db_connection, ibm_db
 app = Flask(__name__, template_folder="templates")
 
 MUP_header = ["military_id", "name", "start_date", "end_date"]
@@ -10,9 +10,18 @@ MUP = [
     [3, "Basel Elsayed", "2/1/2023", "1/3/2024"],
 ]
 
+conn = get_ibm_db_connection()
+
+# Get table headers
+stmt = ibm_db.exec_immediate(conn, "SELECT colname FROM syscat.columns WHERE TABNAME = 'TEST'")
+try:
+    print()
+except:
+    ibm_db.close(conn)
+
+
 @app.route('/')
 def hello_world():
-    print(data)
     return render_template("index.html", MUP_header=MUP_header, MUP=MUP)
 
 if __name__ == "__main__":
