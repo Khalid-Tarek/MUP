@@ -50,14 +50,14 @@ body {font-size:16px;}
     <hr style="width:50px;border:5px solid red" class="w3-round">
   </div>
 
-  <table>
+  <table class="w3-table-all">
     <tr>
-      {% for header in MUP_header %}
+      {% for header in soldiers_table_headers %}
         <th> {{header}} </th>
       {% endfor %}
     </tr>
 
-    {% for row in MUP %}
+    {% for row in soldiers_table_rows %}
       <tr>
         {% for element in row %}
           <td> {{element}} </td>
