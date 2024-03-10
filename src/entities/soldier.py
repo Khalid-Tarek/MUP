@@ -2,8 +2,6 @@ from military_person import *
 from enum import Enum
 from datetime import timedelta
 
-# from pprint import pprint
-
 class GroupNum(Enum):
     GROUP1 = 1
     GROUP2 = 2
@@ -59,17 +57,3 @@ class Soldier(MilitaryPerson):
 
     def change_role(self, role: RoleType):
          self.role = role
-
-
-# soldier = Soldier(1, 
-#                   "Khalid Tarek", 
-#                   date(2023, 1, 2), 
-#                   ["01021657805"], 
-#                   "Cairo",
-#                   "Al Zaher",
-#                   "Al Qubaisi",
-#                   GroupNum.GROUP1,
-#                   EducationType.HIGHER,
-#                   RoleType.AFFAIRS)
-
-# pprint(vars(soldier))
