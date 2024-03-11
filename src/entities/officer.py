@@ -1,8 +1,14 @@
-from military_person import *
-from enum import Enum
 from dateutil.relativedelta import relativedelta
 
-class RoleType(Enum):
+if __name__ == "__main__":
+    from military_person import *
+    from printable_enum import *
+else:
+    from entities.military_person import *
+    from entities.printable_enum import PrintableEnum
+
+
+class RoleType(PrintableEnum):
     SERVICE = 1
     COMMANDER = 2
     ARTILLERY = 3

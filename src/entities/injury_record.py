@@ -1,7 +1,11 @@
 from datetime import date
-from enum import Enum
 
-class Type(Enum):
+if __name__ == "__main__":
+    from printable_enum import *
+else:
+    from entities.printable_enum import PrintableEnum
+
+class Type(PrintableEnum):
     FRACTURE = 1
     BURN = 2
     LACERATION = 3

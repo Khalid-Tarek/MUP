@@ -1,10 +1,12 @@
-# A utility class to help initiate the database
+# A utility module to help initiate the database
 
+import ddl_queries
 import json
 import os
 os.add_dll_directory(f"{os.getcwd()}/env/Lib/site-packages/clidriver/bin/../bin")
 import ibm_db
 from ibm_db import IBM_DBStatement
+
 
 def extract_credentials():
     f = open("config.json")
@@ -47,3 +49,11 @@ def parse_db2_statement(stmt: IBM_DBStatement):
         tuple = ibm_db.fetch_tuple(stmt)
 
     return result
+
+def create_table(name: str):
+    #TODO
+    pass
+
+def check_all_tables_exist():
+    #TODO
+    pass

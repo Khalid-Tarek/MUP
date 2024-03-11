@@ -1,19 +1,24 @@
-from military_person import *
-from enum import Enum
 from datetime import timedelta
 
-class GroupNum(Enum):
+if __name__ == "__main__":
+    from military_person import *
+    from printable_enum import *
+else:
+    from entities.military_person import *
+    from entities.printable_enum import PrintableEnum
+
+class GroupNum(PrintableEnum):
     GROUP1 = 1
     GROUP2 = 2
     GROUP3 = 3
-
-class EducationType(Enum):
+    
+class EducationType(PrintableEnum):
     HIGHER = 424
     EXTRA_SECONDARY = 604
     SECONDARY = 789
     NONE = 1154
 
-class RoleType(Enum):
+class RoleType(PrintableEnum):
     SERVICE = 1
     AFFAIRS = 2
     OFFICE = 3
