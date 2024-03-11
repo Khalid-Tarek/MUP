@@ -5,7 +5,7 @@ import json
 import os
 os.add_dll_directory(f"{os.getcwd()}/env/Lib/site-packages/clidriver/bin/../bin")
 import ibm_db
-from ibm_db import IBM_DBStatement
+from ibm_db import IBM_DBStatement, IBM_DBConnection
 
 
 def extract_credentials():
@@ -28,7 +28,7 @@ connection_string = (
 
 # A helper function to return a db2 connection
 # Make sure to close the db connection after you're done
-def get_ibm_db_connection():
+def get_ibm_db_connection() -> IBM_DBConnection:
     try:
         conn = ibm_db.connect(connection_string, '', '')
         print("Connection established successfully.")
@@ -40,7 +40,7 @@ def get_ibm_db_connection():
     
 # A helper function to parse the db2 statement
 # returns a list of rows (which are also lists)
-def parse_db2_statement(stmt: IBM_DBStatement):
+def parse_db2_statement(stmt: IBM_DBStatement) -> list:
     result = []
 
     tuple = ibm_db.fetch_tuple(stmt)
@@ -50,10 +50,44 @@ def parse_db2_statement(stmt: IBM_DBStatement):
 
     return result
 
-def create_table(name: str):
-    #TODO
-    pass
+# Creates the necessary table as per the name passed using the connection passed  
+def create_table(conn: IBM_DBConnection, name: str):
+    query = ''
+    match name:
+        case 'SOLDIER':
+            query = ddl_queries.SOLDIERS_TABLE
+        case 'TELEPHONE':
+            query = ddl_queries.TELEPHONE_TABLE
+            #TODO
+            return
+        case 'OFFICER':
+            query = ddl_queries.OFFICER_TABLE
+            #TODO
+            return
+        case 'INJURY_RECORD':
+            query = ddl_queries.INJURY_RECORD_TABLE
+            #TODO
+            return
+        case 'OFFICER_SOLDIER':
+            query = ddl_queries.OFFICER_SOLDIER_TABLE    
+            #TODO
+            return
+        case _:
+            return
+        
+    try:
+        stmt = ibm_db.exec_immediate(conn, query)
+    except Exception as e:
+        print(f"Error: {e}")
+    else:
+        print(f"{name} created successfully!")
 
-def check_all_tables_exist():
-    #TODO
-    pass
+# Checks the existence of all tables of the database, and attempts to create them if not found
+def check_or_create_all_tables(conn: IBM_DBConnection):
+    tables = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER']
+    for table in tables:
+        existence_query = f"SELECT count(1) FROM SYSIBM.SYSTABLES WHERE NAME = '{table}' AND TYPE = 'T'"
+        stmt = ibm_db.exec_immediate(conn, existence_query)
+        result = parse_db2_statement(stmt)
+        if result[0][0] != 1: 
+            create_table(conn, table)

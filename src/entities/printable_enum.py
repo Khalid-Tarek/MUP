@@ -18,7 +18,7 @@ class PrintableEnum(Enum):
         name_list = [e.name for e in cls]
         last_element = name_list[-1]
         for member in name_list:
-            string += str(member)
+            string += f'\'{member}\''
             if member != last_element:
                 string += ", "
         return string

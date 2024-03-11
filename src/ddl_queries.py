@@ -13,13 +13,14 @@ SOLDIERS_TABLE = (
         f"group_num SMALLINT NOT NULL CHECK (group_num IN ({GN.as_list_of_values_string()})), "
         f"education VARCHAR(20) NOT NULL CHECK (education IN ({ET.as_list_of_keys_string()})), "
         f"role VARCHAR(20) NOT NULL CHECK (role IN ({RT.as_list_of_keys_string()})), "
-        f"end_date DATE NOT NULL CHECK (end_date > start_date), "
-        f"presence SMALLINT NOT NULL CHECK (presence IN (0, 1))"
+        f"end_date DATE NOT NULL, "
+        f"presence SMALLINT NOT NULL CHECK (presence IN (0, 1)),"
+        f"CONSTRAINT CHK_EndAfterStart CHECK (end_date > start_date)"
     f");"
 )
 
-TELEPHONES_TABLE = (
-    f"CREATE TABLE telephones( "
+TELEPHONE_TABLE = (
+    f"CREATE TABLE telephone( "
         f"military_id INT NOT NULL, "
         f"telephone CHAR(11) NOT NULL, "
         f"CONSTRAINT fk_SoldierTelephone "
@@ -30,4 +31,14 @@ TELEPHONES_TABLE = (
     f");"
 )
 
-print(TELEPHONES_TABLE)
+OFFICER_TABLE = (
+    f""
+)
+
+INJURY_RECORD_TABLE = (
+    f""
+)
+
+OFFICER_SOLDIER_TABLE = (
+    f""
+)
