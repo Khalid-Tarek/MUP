@@ -58,16 +58,10 @@ def create_table(conn: IBM_DBConnection, name: str):
             query = ddl_queries.SOLDIERS_TABLE
         case 'TELEPHONE':
             query = ddl_queries.TELEPHONE_TABLE
-            #TODO
-            return
         case 'OFFICER':
             query = ddl_queries.OFFICER_TABLE
-            #TODO
-            return
         case 'INJURY_RECORD':
             query = ddl_queries.INJURY_RECORD_TABLE
-            #TODO
-            return
         case 'OFFICER_SOLDIER':
             query = ddl_queries.OFFICER_SOLDIER_TABLE    
             #TODO
