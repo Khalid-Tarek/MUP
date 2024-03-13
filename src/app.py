@@ -1,27 +1,27 @@
 from flask import Flask, render_template
-from database_utils import *
+from my_utils import HOST, PORT, BASE_LINK, UNIT_NAME
+import database_utils
 app = Flask(__name__, template_folder="templates")
 
-conn = get_ibm_db_connection()
-check_or_create_all_tables(conn)
+conn = database_utils.get_ibm_db_connection()
+database_utils.check_or_create_all_tables(conn)
 
-# Get table headers
-stmt = ibm_db.exec_immediate(conn, "SELECT colname FROM syscat.columns WHERE TABNAME = 'SOLDIER' ORDER BY COLNO")
-soldiers_table_headers = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
+soldiers_table_headers, soldiers_table_rows = database_utils.get_soldiers_table(conn, "SOLDIER")
+officers_table_headers, officers_table_rows = database_utils.get_soldiers_table(conn, 'OFFICER')
 
-# Get table content
-stmt = ibm_db.exec_immediate(conn, "SELECT * FROM SOLDIER")
-soldiers_table_rows = parse_db2_statement(stmt)
-
-ibm_db.close(conn)
+database_utils.ibm_db.close(conn)
 
 @app.route('/')
 def hello_world():
     return render_template(
-        "index.html", 
+        "index.html",
+        BASE_LINK = BASE_LINK,
+        UNIT_NAME = UNIT_NAME,
         soldiers_table_headers = soldiers_table_headers, 
-        soldiers_table_rows = soldiers_table_rows
+        soldiers_table_rows = soldiers_table_rows,
+        officers_table_headers = officers_table_headers,
+        officers_table_rows = officers_table_rows
     )
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", debug=True)
+    app.run(host=HOST, port=PORT, debug=True)

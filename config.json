@@ -5,5 +5,8 @@
         "database_hostname": "localhost",
         "database_port": "25000",
         "database_name": "mupdb"
-    }
+    },
+    "host": "127.0.0.1",
+    "port": "5000",
+    "unit_name": "Your Unit Here"
 }

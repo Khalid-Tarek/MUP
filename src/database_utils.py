@@ -1,29 +1,22 @@
 # A utility module to help initiate the database
 
+from typing import Any, List, Tuple
 import ddl_queries
-import json
 import os
 os.add_dll_directory(f"{os.getcwd()}/env/Lib/site-packages/clidriver/bin/../bin")
 import ibm_db
 from ibm_db import IBM_DBStatement, IBM_DBConnection
+from my_utils import DB2VARIABLES as DB2
 
 
-def extract_credentials():
-    f = open("config.json")
-    db2 = json.load(f)["db2"]
-    f.close()
-
-    return db2
- 
-db2 = extract_credentials()
 
 connection_string = (
-    f"DATABASE={db2['database_name']};"
-    f"HOSTNAME={db2['database_hostname']};"
-    f"PORT={db2['database_port']};"
+    f"DATABASE={DB2['database_name']};"
+    f"HOSTNAME={DB2['database_hostname']};"
+    f"PORT={DB2['database_port']};"
     f"PROTOCOL=TCPIP;"
-    f"UID={db2['database_username']};"
-    f"PWD={db2['database_password']};"
+    f"UID={DB2['database_username']};"
+    f"PWD={DB2['database_password']};"
 )
 
 # A helper function to return a db2 connection
@@ -85,3 +78,18 @@ def check_or_create_all_tables(conn: IBM_DBConnection):
         result = parse_db2_statement(stmt)
         if result[0][0] != 1: 
             create_table(conn, table)
+
+# A function that queries the database for the table with the name passed (must be all capital) and refines it for display
+def get_soldiers_table(conn: IBM_DBConnection, name) -> Tuple[List[str], List[List]]:
+    
+    # Get table headers
+    stmt = ibm_db.exec_immediate(conn, f"SELECT colname FROM syscat.columns WHERE TABNAME = '{name}' ORDER BY COLNO")
+    table_headers: List[str] = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
+    table_headers = [x.replace('_', ' ') for x in table_headers]
+
+    # Get table content
+    stmt = ibm_db.exec_immediate(conn, f"SELECT * FROM {name}")
+    table_rows: List[List[Any | str]] = parse_db2_statement(stmt)
+    table_rows = [[str(x).replace('_', ' ') for x in row] for row in table_rows]
+
+    return table_headers, table_rows
