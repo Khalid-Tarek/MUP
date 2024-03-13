@@ -7,6 +7,9 @@ else:
     from entities.military_person import *
     from entities.printable_enum import PrintableEnum
 
+# These are hardcoded Enumeration Classes for these fixed values used by the soldier class
+# A future feature would require saving these values to the database and creating the Enums dynamically
+
 class GroupNum(PrintableEnum):
     GROUP1 = 1
     GROUP2 = 2
@@ -14,7 +17,7 @@ class GroupNum(PrintableEnum):
     
 class EducationType(PrintableEnum):
     HIGHER = 424
-    EXTRA_SECONDARY = 604
+    EXTRA_SECONDARY = 608
     SECONDARY = 789
     NONE = 1154
 
