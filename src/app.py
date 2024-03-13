@@ -6,11 +6,11 @@ conn = get_ibm_db_connection()
 check_or_create_all_tables(conn)
 
 # Get table headers
-stmt = ibm_db.exec_immediate(conn, "SELECT colname FROM syscat.columns WHERE TABNAME = 'TEST'")
+stmt = ibm_db.exec_immediate(conn, "SELECT colname FROM syscat.columns WHERE TABNAME = 'SOLDIER' ORDER BY COLNO")
 soldiers_table_headers = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
 
 # Get table content
-stmt = ibm_db.exec_immediate(conn, "SELECT * FROM TEST")
+stmt = ibm_db.exec_immediate(conn, "SELECT * FROM SOLDIER")
 soldiers_table_rows = parse_db2_statement(stmt)
 
 ibm_db.close(conn)

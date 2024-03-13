@@ -21,9 +21,17 @@ class EducationType(PrintableEnum):
 class RoleType(PrintableEnum):
     SERVICE = 1
     AFFAIRS = 2
-    OFFICE = 3
-    DRIVER = 4
-    KITCHEN = 5
+    WITH_OFFICER = 3
+    WITH_OFFICER_DRIVER = 4
+    DRIVER = 5
+    KITCHEN = 6
+
+class PresenceState(PrintableEnum):
+    VACATION = 0
+    PRESENT = 1
+    MISSION = 2
+    SICK_LEAVE = 3
+    ABSENT = 4
 
 class Soldier(MilitaryPerson):
 
