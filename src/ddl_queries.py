@@ -4,7 +4,9 @@ from entities.soldier import RoleType as SRT, GroupNum as GN, PresenceState as P
 from entities.officer import RoleType as ORT
 from entities.injury_record import Type as T
 
-SOLDIERS_TABLE = (
+DDL_QUERIES = {}
+
+DDL_QUERIES['SOLDIER'] = (
     f"CREATE TABLE soldier( "
         f"military_id INT NOT NULL PRIMARY KEY, "
         f"name VARCHAR(50) NOT NULL, "
@@ -25,7 +27,7 @@ SOLDIERS_TABLE = (
     f");"
 )
 
-TELEPHONE_TABLE = (
+DDL_QUERIES['TELEPHONE'] = (
     f"CREATE TABLE telephone( "
         f"military_id INT NOT NULL, "
         f"telephone CHAR(11) NOT NULL PRIMARY KEY, "
@@ -37,7 +39,7 @@ TELEPHONE_TABLE = (
     f");"
 )
 
-OFFICER_TABLE = (
+DDL_QUERIES['OFFICER'] = (
     f"CREATE TABLE officer( "
         f"military_id INT NOT NULL PRIMARY KEY, "
         f"name VARCHAR(50) NOT NULL, "
@@ -52,7 +54,7 @@ OFFICER_TABLE = (
     f");"
 )
 
-INJURY_RECORD_TABLE = (
+DDL_QUERIES['INJURY_RECORD'] = (
     f"CREATE TABLE injury_record("
         f"injury_record_id INT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1), "
         f"military_id INT NOT NULL, "
@@ -66,7 +68,25 @@ INJURY_RECORD_TABLE = (
     f");"
 )
 
-OFFICER_SOLDIER_TABLE = (
-    #TODO
-    f""
+DDL_QUERIES['OFFICER_SOLDIER'] = (
+    f"CREATE TABLE officer_soldier("
+        f"soldier_military_id INT NOT NULL PRIMARY KEY, "
+        f"officer_military_id INT NOT NULL, "
+        f"FOREIGN KEY (soldier_military_id) "
+        f"REFERENCES soldier(military_id) "
+            f"ON UPDATE NO ACTION "
+            f"ON DELETE CASCADE, "
+        f"FOREIGN KEY (officer_military_id) "
+        f"REFERENCES officer(military_id) "
+            f"ON UPDATE NO ACTION "
+            f"ON DELETE CASCADE"
+    f");"
+)
+
+DDL_QUERIES['REPORT'] = (
+    f"CREATE TABLE report("
+        f"link VARCHAR(50) NOT NULL PRIMARY KEY, "
+        f"date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+        f"type VARCHAR(20) NOT NULL "
+    f");"
 )

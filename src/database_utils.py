@@ -1,14 +1,12 @@
 # A utility module to help initiate the database
 
 from typing import Any, List, Tuple
-import ddl_queries
+from ddl_queries import DDL_QUERIES
 import os
 os.add_dll_directory(f"{os.getcwd()}/env/Lib/site-packages/clidriver/bin/../bin")
 import ibm_db
 from ibm_db import IBM_DBStatement, IBM_DBConnection
 from my_utils import DB2VARIABLES as DB2
-
-
 
 connection_string = (
     f"DATABASE={DB2['database_name']};"
@@ -44,26 +42,9 @@ def parse_db2_statement(stmt: IBM_DBStatement) -> list:
     return result
 
 # Creates the necessary table as per the name passed using the connection passed  
-def create_table(conn: IBM_DBConnection, name: str):
-    query = ''
-    match name:
-        case 'SOLDIER':
-            query = ddl_queries.SOLDIERS_TABLE
-        case 'TELEPHONE':
-            query = ddl_queries.TELEPHONE_TABLE
-        case 'OFFICER':
-            query = ddl_queries.OFFICER_TABLE
-        case 'INJURY_RECORD':
-            query = ddl_queries.INJURY_RECORD_TABLE
-        case 'OFFICER_SOLDIER':
-            query = ddl_queries.OFFICER_SOLDIER_TABLE    
-            #TODO
-            return
-        case _:
-            return
-        
+def create_table(conn: IBM_DBConnection, name: str):    
     try:
-        stmt = ibm_db.exec_immediate(conn, query)
+        stmt = ibm_db.exec_immediate(conn, DDL_QUERIES[name])
     except Exception as e:
         print(f"Error: {e}")
     else:
@@ -71,13 +52,13 @@ def create_table(conn: IBM_DBConnection, name: str):
 
 # Checks the existence of all tables of the database, and attempts to create them if not found
 def check_or_create_all_tables(conn: IBM_DBConnection):
-    tables = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER']
-    for table in tables:
-        existence_query = f"SELECT count(1) FROM SYSIBM.SYSTABLES WHERE NAME = '{table}' AND TYPE = 'T'"
+    table_names = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER', 'OFFICER_SOLDIER', 'REPORT']
+    for table_name in table_names:
+        existence_query = f"SELECT count(1) FROM SYSIBM.SYSTABLES WHERE NAME = '{table_name}' AND TYPE = 'T'"
         stmt = ibm_db.exec_immediate(conn, existence_query)
         result = parse_db2_statement(stmt)
         if result[0][0] != 1: 
-            create_table(conn, table)
+            create_table(conn, table_name)
 
 # A function that queries the database for the table with the name passed (must be all capital) and refines it for display
 def get_soldiers_table(conn: IBM_DBConnection, name) -> Tuple[List[str], List[List]]:
