@@ -57,12 +57,12 @@
   <div class="w3-responsive" style="max-height: 400px;">
     <table class="w3-table-all w3-hoverable">
       <tr class="w3-red sticky-header-row">
-        {% for header in soldiers_table_headers %}
+        {% for header in soldiers_table['headers'] %}
         <th class="table-header" style="border: 2px solid white;"> {{header}} </th>
         {% endfor %}
       </tr>
       
-      {% for row in soldiers_table_rows %}
+      {% for row in soldiers_table['rows'] %}
       <tr>
         {% for element in row %}
         <td class="table-body" onclick="onClick(this)"> {{element}} </td>
@@ -80,12 +80,12 @@
   <div class="w3-responsive" style="max-height: 400px;">
     <table class="w3-table-all w3-hoverable">
       <tr class="w3-red sticky-header-row">
-        {% for header in officers_table_headers %}
+        {% for header in officers_table['headers'] %}
         <th class="table-header"> {{header}} </th>
         {% endfor %}
       </tr>
       
-      {% for row in officers_table_rows %}
+      {% for row in officers_table['rows'] %}
       <tr>
         {% for element in row %}
         <td class="table-body" onclick="onClick(this)"> {{element}} </td>

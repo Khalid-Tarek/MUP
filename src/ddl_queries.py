@@ -23,7 +23,7 @@ DDL_QUERIES['SOLDIER'] = (
         f"CONSTRAINT CHK_group_num_values CHECK (group_num IN ({GN.as_list_of_values_string()})), "
         f"CONSTRAINT CHK_presence_values CHECK (presence IN ({PS.as_list_of_keys_string()})), "
         f"CONSTRAINT CHK_education_values CHECK (education IN ({ET.as_list_of_keys_string()})), "
-        f"CONSTRAINT CHK_EndAfterStart CHECK (end_date > start_date)"
+        f"CONSTRAINT CHK_end_after_start CHECK (end_date > start_date)"
     f");"
 )
 
@@ -43,7 +43,7 @@ DDL_QUERIES['OFFICER'] = (
     f"CREATE TABLE officer( "
         f"military_id INT NOT NULL PRIMARY KEY, "
         f"name VARCHAR(50) NOT NULL, "
-        f"role VARCHAR(20) NOT NULL CHECK (role IN ({ORT.as_list_of_keys_string()})), "
+        f"role VARCHAR(20) NOT NULL, "
         f"start_date DATE NOT NULL, "
         f"years_of_service SMALLINT NOT NULL, "
         f"gun_num VARCHAR(20) NOT NULL, "

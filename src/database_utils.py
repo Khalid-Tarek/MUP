@@ -17,18 +17,23 @@ connection_string = (
     f"PWD={DB2['database_password']};"
 )
 
-# A helper function to return a db2 connection
-# Make sure to close the db connection after you're done
+# A helper function to start and return a db2 connection
+# Make sure to close the db connection on exit
 def get_ibm_db_connection() -> IBM_DBConnection:
     try:
         conn = ibm_db.connect(connection_string, '', '')
-        print("Connection established successfully.")
+        print(f"Connection to {DB2['database_name']} established successfully.")
     except Exception as e:
         print(f"Error: {e}")
         return None
     else:
         return conn
-    
+
+# A helper function to close a db2 connection
+def close_ibm_db_connection(conn: IBM_DBConnection):
+    ibm_db.close(conn)
+    print(f"Connection to {DB2['database_name']} terminated successfully.")
+
 # A helper function to parse the db2 statement
 # returns a list of rows (which are also lists)
 def parse_db2_statement(stmt: IBM_DBStatement) -> list:
@@ -60,15 +65,15 @@ def check_or_create_all_tables(conn: IBM_DBConnection):
         if result[0][0] != 1: 
             create_table(conn, table_name)
 
-# A function that queries the database for the table with the name passed (must be all capital) and refines it for display
-def get_soldiers_table(conn: IBM_DBConnection, name) -> Tuple[List[str], List[List]]:
+# Queries the database for the table with the name passed (must be all capital) and refines it for display
+def get_table(conn: IBM_DBConnection, name) -> Tuple[List[str], List[List]]:
     
-    # Get table headers
+    # Get table headers and replace underscores in the header names to spaces
     stmt = ibm_db.exec_immediate(conn, f"SELECT colname FROM syscat.columns WHERE TABNAME = '{name}' ORDER BY COLNO")
     table_headers: List[str] = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
     table_headers = [x.replace('_', ' ') for x in table_headers]
 
-    # Get table content
+    # Get table contentand replace underscores in the elements names to spaces of every row
     stmt = ibm_db.exec_immediate(conn, f"SELECT * FROM {name}")
     table_rows: List[List[Any | str]] = parse_db2_statement(stmt)
     table_rows = [[str(x).replace('_', ' ') for x in row] for row in table_rows]
