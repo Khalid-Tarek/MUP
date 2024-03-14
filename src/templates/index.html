@@ -7,10 +7,13 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
 <style>
-body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif}
-body {font-size:16px;}
-.w3-half img{margin-bottom:-6px;margin-top:16px;opacity:0.8;cursor:pointer}
-.w3-half img:hover{opacity:1}
+  body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif;}
+  body {font-size:16px;}
+
+  .sticky-header-row {position: sticky; top: -1px;}
+
+  .table-header {text-align: center; font-size: 14px;}
+  .table-body {font-size: 13px;}
 </style>
 </head>
 <body>
@@ -53,16 +56,16 @@ body {font-size:16px;}
   
   <div class="w3-responsive" style="max-height: 400px;">
     <table class="w3-table-all w3-hoverable">
-      <tr class="w3-red" style="position: sticky; top: -1px;">
+      <tr class="w3-red sticky-header-row">
         {% for header in soldiers_table_headers %}
-        <th style="text-align: center;"> {{header}} </th>
+        <th class="table-header" style="border: 2px solid #ffffffff;"> {{header}} </th>
         {% endfor %}
       </tr>
       
       {% for row in soldiers_table_rows %}
       <tr>
         {% for element in row %}
-        <td> {{element}} </td>
+        <td class="table-body"> {{element}} </td>
         {% endfor %}
       </tr>
       {% endfor %}
@@ -76,16 +79,16 @@ body {font-size:16px;}
   
   <div class="w3-responsive" style="max-height: 400px;">
     <table class="w3-table-all w3-hoverable">
-      <tr class="w3-red">
+      <tr class="w3-red sticky-header-row">
         {% for header in officers_table_headers %}
-        <th style="text-align: center;"> {{header}} </th>
+        <th class="table-header"> {{header}} </th>
         {% endfor %}
       </tr>
       
       {% for row in officers_table_rows %}
       <tr>
         {% for element in row %}
-        <td> {{element}} </td>
+        <td class="table-body"> {{element}} </td>
         {% endfor %}
       </tr>
       {% endfor %}
