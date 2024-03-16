@@ -3,12 +3,12 @@ from typing import Any
 
 class ListDictParsable:
     
-    # Created to help parse objects through lists [DEPRECATED] use from_list_to_dict
+    # [DEPRECATED: use from_list_to_dict(list)] Created to help parse objects through lists
     @staticmethod
     def from_list(list: list[Any | str]) -> Any:
         pass
 
-    # Created to help translate objects to lists [DEPRECATED]
+    # [DEPRECATED] Created to help translate objects to lists
     def to_list(self) -> list[Any | str]:
         pass
 

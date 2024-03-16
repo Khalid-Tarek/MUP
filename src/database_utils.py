@@ -19,6 +19,7 @@ connection_string = (
     f"UID={DB2['database_username']};"
     f"PWD={DB2['database_password']};"
 )
+TABLE_NAMES = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER', 'REPORT']
 
 # A helper function to start and return a db2 connection
 # Make sure to close the db connection on exit
@@ -60,8 +61,7 @@ def create_table(conn: IBM_DBConnection, name: str):
 
 # Checks the existence of all tables of the database, and attempts to create them if not found
 def check_or_create_all_tables(conn: IBM_DBConnection):
-    table_names = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER', 'OFFICER_SOLDIER', 'REPORT']
-    for table_name in table_names:
+    for table_name in TABLE_NAMES:
         existence_query = f"SELECT count(1) FROM SYSIBM.SYSTABLES WHERE NAME = '{table_name}' AND TYPE = 'T'"
         stmt = ibm_db.exec_immediate(conn, existence_query)
         result = parse_db2_statement(stmt)
@@ -78,12 +78,20 @@ def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dic
             for row in rows: dictionary[str(row[0])] = Officer.from_list_to_dict(row)
         case 'INJURY_RECORD':
             for row in rows: dictionary[str(row[0])] = InjuryRecord.from_list_to_dict(row)
+        case 'TELEPHONE':
+            for row in rows:
+                if str(row[0]) in dictionary:
+                    dictionary[str(row[0])].append(row[1])
+                else:
+                    dictionary[str(row[0])] = [row[1]]
+        case 'OFFICER_SOLDIER':
+            for row in rows: dictionary[str(row[0])] = str(row[1])
         case _:
             pass
 
     return dictionary
 
-# Creates a dictionary of objects ({military_id: object}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
+# [DEPRECATED] Creates a dictionary of objects ({military_id: object}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
 def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[Soldier | Officer | InjuryRecord]:
     dictionary = {}
     match entity_name:
@@ -98,13 +106,12 @@ def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[S
 
     return dictionary
 
-# Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations of all the rows
-def get_table(conn: IBM_DBConnection, name) -> Tuple[list[str], dict[str, dict[str, Any]]]:
+# Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations (dictionaries: {'attribute': value}) of all the rows
+def get_table_as_dict(conn: IBM_DBConnection, name) -> Tuple[list[str], dict[str, dict[str, Any]]]:
     
     # Get table headers and replace underscores in the header names to spaces
     stmt = ibm_db.exec_immediate(conn, f"SELECT colname FROM syscat.columns WHERE TABNAME = '{name}' ORDER BY COLNO")
     table_headers: list[str] = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
-    table_headers = [x.replace('_', ' ') for x in table_headers]
 
     # Get table content and transform the lists to readablle dictionaries
     stmt = ibm_db.exec_immediate(conn, f"SELECT * FROM {name}")
@@ -113,3 +120,30 @@ def get_table(conn: IBM_DBConnection, name) -> Tuple[list[str], dict[str, dict[s
 
     return table_headers, table_dict
 
+# Queries the database for all the data in each of it's tables and returns a dictionary of tables (which are dictionaries themselves)
+def get_database_tables_as_dict(conn: IBM_DBConnection):
+    database_tables = {}
+
+    for table_name in TABLE_NAMES:
+        if table_name == 'REPORT': continue
+        table = {}
+        table['headers'], table['dictionaries'] = get_table_as_dict(conn, table_name)
+        database_tables[table_name] = table
+
+    return database_tables
+
+""" Final structure for the above function:  
+    database_tables = {
+                       'table_0': {
+                                   'headers': ['header_0', 'header_1', ......],
+                                   'dictionaries': {
+                                                    'id_0': {'attr_0': value_0, 'attr_1': value_1, ...... },
+                                                    'id_1': {'attr_0': value_0, 'attr_1': value_1, ...... },
+                                                    ......
+                                                   }
+                                  },
+                        'table_1': { ...... },
+                        ......
+                       }
+
+"""

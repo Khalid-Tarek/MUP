@@ -89,15 +89,15 @@
   <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
     <table class="w3-table-all w3-hoverable">
       <tr class="w3-red sticky-header-row">
-        {% for header in soldiers_table['headers'] %}
-          <th class="table-header" style="border: 2px solid white;"> {{header}} </th>
+        {% for header in database_tables['SOLDIER']['headers'] %}
+          <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
         {% endfor %}
       </tr>
       
-      {% for id, dict in soldiers_table['dictionaries'].items() %}
+      {% for id, dict in database_tables['SOLDIER']['dictionaries'].items() %}
         <tr onclick="onClick(this, '{{id}}', 'SOLDIER' )" >
           {% for key, value in dict.items() %}
-            <td class="table-body"> {{value}} </td>
+            <td class="table-body"> {{value | replace('_', ' ') }} </td>
           {% endfor %}
         </tr>
       {% endfor %}
@@ -112,15 +112,15 @@
   <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
     <table class="w3-table-all w3-hoverable">
       <tr class="w3-red sticky-header-row">
-        {% for header in officers_table['headers'] %}
-          <th class="table-header" style="border: 2px solid white;"> {{header}} </th>
+        {% for header in database_tables['OFFICER']['headers'] %}
+          <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
         {% endfor %}
       </tr>
       
-      {% for id, dict in officers_table['dictionaries'].items() %}
+      {% for id, dict in database_tables['OFFICER']['dictionaries'].items() %}
         <tr onclick="onClick(this, '{{id}}', 'OFFICER' )">
           {% for key, value in dict.items() %}
-            <td class="table-body"> {{value}} </td>
+            <td class="table-body"> {{value | replace('_', ' ')}} </td>
           {% endfor %}
         </tr>
       {% endfor %}
@@ -135,9 +135,15 @@
 <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
 
 <script>
-var soldier_dictionaries = JSON.parse('{{ soldiers_table["dictionaries"] | tojson | safe}}');
-var officer_dictionaries = JSON.parse('{{ officers_table["dictionaries"] | tojson | safe}}');
-var injury_record_dictionaries = JSON.parse('{{ injury_records_table["dictionaries"] | tojson | safe}}');
+var database_tables = JSON.parse('{{ database_tables | tojson | safe}}');
+var soldier_dictionaries = database_tables['SOLDIER']['dictionaries'];
+var officer_dictionaries = database_tables['OFFICER']['dictionaries'];
+var injury_record_dictionaries = database_tables['INJURY_RECORD']['dictionaries'];
+var telephones = database_tables['TELEPHONE']['dictionaries'];
+var officer_soldiers = database_tables['OFFICER_SOLDIER']['dictionaries'];
+
+console.log(telephones);
+console.log(officer_soldiers);
 
 var soldier_attributes = ["MILITARY_ID", "NAME", "START_DATE", "END_DATE", "ROLE", "GROUP_NUM", "PRESENCE", "EDUCATION", "ADDRESS"];
 var officer_attributes = ["MILITARY_ID", "NAME", "START_DATE", "YEARS_OF_SERVICE", "ROLE", "GUN_NUM", " ", " ", "ADDRESS"];
