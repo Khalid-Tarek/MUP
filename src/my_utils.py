@@ -15,6 +15,6 @@ DB2VARIABLES = pv["db2"]
 
 HOST = pv["host"]
 PORT = pv["port"]
-BASE_LINK = f"http://{HOST}:{PORT}/"
+BASE_LINK = f"http://{HOST}:{PORT}"
 
 UNIT_NAME = pv["unit_name"]
