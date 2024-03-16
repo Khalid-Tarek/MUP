@@ -10,16 +10,18 @@ database_utils.check_or_create_all_tables(conn)
 
 @app.route('/')
 def hello_world():
-    soldiers_table, officers_table = {}, {}
-    soldiers_table['headers'], soldiers_table['rows'] = database_utils.get_table(conn, "SOLDIER")
-    officers_table['headers'], officers_table['rows'] = database_utils.get_table(conn, 'OFFICER')
+    soldiers_table, officers_table, injury_records_table = {}, {}, {}
+    soldiers_table['headers'], soldiers_table['dictionaries'] = database_utils.get_table(conn, 'SOLDIER')
+    officers_table['headers'], officers_table['dictionaries'] = database_utils.get_table(conn, 'OFFICER')
+    injury_records_table['headers'], injury_records_table['dictionaries'] = database_utils.get_table(conn, 'INJURY_RECORD')
 
     return render_template(
         "index.html",
         BASE_LINK = BASE_LINK,
         UNIT_NAME = UNIT_NAME,
         soldiers_table = soldiers_table,
-        officers_table = officers_table
+        officers_table = officers_table,
+        injury_records_table = injury_records_table
     )
 
 if __name__ == "__main__":

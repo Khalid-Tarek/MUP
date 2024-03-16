@@ -1,12 +1,15 @@
 # A utility module to help initiate the database
 
-from typing import Any, List, Tuple
+from typing import Any, Tuple
 from ddl_queries import DDL_QUERIES
 import os
 os.add_dll_directory(f"{os.getcwd()}/env/Lib/site-packages/clidriver/bin/../bin")
 import ibm_db
 from ibm_db import IBM_DBStatement, IBM_DBConnection
 from my_utils import DB2VARIABLES as DB2
+from entities.soldier import Soldier
+from entities.officer import Officer
+from entities.injury_record import InjuryRecord
 
 connection_string = (
     f"DATABASE={DB2['database_name']};"
@@ -65,17 +68,48 @@ def check_or_create_all_tables(conn: IBM_DBConnection):
         if result[0][0] != 1: 
             create_table(conn, table_name)
 
-# Queries the database for the table with the name passed (must be all capital) and refines it for display
-def get_table(conn: IBM_DBConnection, name) -> Tuple[List[str], List[List]]:
+# Creates a dictionary of dictionaries ({military_id: {attr: value}}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
+def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dict[str, Any]]:
+    dictionary = {}
+    match entity_name:
+        case 'SOLDIER':
+            for row in rows: dictionary[str(row[0])] = Soldier.from_list_to_dict(row)
+        case 'OFFICER':
+            for row in rows: dictionary[str(row[0])] = Officer.from_list_to_dict(row)
+        case 'INJURY_RECORD':
+            for row in rows: dictionary[str(row[0])] = InjuryRecord.from_list_to_dict(row)
+        case _:
+            pass
+
+    return dictionary
+
+# Creates a dictionary of objects ({military_id: object}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
+def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[Soldier | Officer | InjuryRecord]:
+    dictionary = {}
+    match entity_name:
+        case 'SOLDIER':
+            for row in rows: dictionary[str(row[0])] = Soldier.from_list(row)
+        case 'OFFICER':
+            for row in rows: dictionary[str(row[0])] = Officer.from_list(row)
+        case 'INJURY_RECORD':
+            for row in rows: dictionary[str(row[0])] = InjuryRecord.from_list(row)
+        case _:
+            pass
+
+    return dictionary
+
+# Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations of all the rows
+def get_table(conn: IBM_DBConnection, name) -> Tuple[list[str], dict[str, dict[str, Any]]]:
     
     # Get table headers and replace underscores in the header names to spaces
     stmt = ibm_db.exec_immediate(conn, f"SELECT colname FROM syscat.columns WHERE TABNAME = '{name}' ORDER BY COLNO")
-    table_headers: List[str] = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
+    table_headers: list[str] = sum(parse_db2_statement(stmt), tuple()) # I do this to flatten the 2D result list
     table_headers = [x.replace('_', ' ') for x in table_headers]
 
-    # Get table contentand replace underscores in the elements names to spaces of every row
+    # Get table content and transform the lists to readablle dictionaries
     stmt = ibm_db.exec_immediate(conn, f"SELECT * FROM {name}")
-    table_rows: List[List[Any | str]] = parse_db2_statement(stmt)
-    table_rows = [[str(x).replace('_', ' ') for x in row] for row in table_rows]
+    table_rows: list[list[Any | str]] = parse_db2_statement(stmt)
+    table_dict: dict[str, dict[str, Any]] = rows_to_dict(table_rows, name)
 
-    return table_headers, table_rows
+    return table_headers, table_dict
+
