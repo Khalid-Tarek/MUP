@@ -77,7 +77,11 @@ def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dic
         case 'OFFICER':
             for row in rows: dictionary[str(row[0])] = Officer.from_list_to_dict(row)
         case 'INJURY_RECORD':
-            for row in rows: dictionary[str(row[0])] = InjuryRecord.from_list_to_dict(row)
+            for row in rows:
+                if str(row[1]) in dictionary:
+                        dictionary[str(row[1])].append(InjuryRecord.from_list_to_dict(row))
+                else:
+                    dictionary[str(row[1])] = [InjuryRecord.from_list_to_dict(row)]
         case 'TELEPHONE':
             for row in rows:
                 if str(row[0]) in dictionary:
@@ -85,11 +89,21 @@ def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dic
                 else:
                     dictionary[str(row[0])] = [row[1]]
         case 'OFFICER_SOLDIER':
-            for row in rows: dictionary[str(row[0])] = str(row[1])
+            for row in rows: 
+                if str(row[1]) in dictionary:
+                    dictionary[str(row[1])].append(str(row[0]))
+                else:
+                    dictionary[str(row[1])] = [str(row[0])]
         case _:
             pass
 
     return dictionary
+""" For case INJURY_RECORD, TELEPHONE and OFFICER_SOLDIER, their structures are different:
+    
+    INJURY_RECORD:      {'id0' : [injury0, injury1, .....], 'id1' : [injury0, injury1, .....], ...... }        (injury : {attr0: value0, attr1: value1, ..... })
+    TELEPHONE:          {'id0': ['telephone0', 'telephone1', ..... ], 'id1': ['telephone0', 'telephone1', ..... ], ..... }
+    OFFICER_SOLDIER:    {'officer_id0': ['soldier_id0', 'soldier_id1', ..... ], 'officer_id1': ['soldier_id0', 'soldier_id1', ..... ], ..... }
+"""
 
 # [DEPRECATED] Creates a dictionary of objects ({military_id: object}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
 def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[Soldier | Officer | InjuryRecord]:
