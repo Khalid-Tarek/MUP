@@ -161,3 +161,19 @@ def get_database_tables_as_dict(conn: IBM_DBConnection):
                        }
 
 """
+
+def delete_person(conn: IBM_DBConnection, type: str, id: int) -> Tuple[int, str]:
+    
+    rows_affected = -1
+    message = ''
+
+    try:
+        stmt = ibm_db.exec_immediate(conn, f'DELETE FROM {type} WHERE military_id = {id}')
+    except:
+        message = f"Transaction couldn't be completed: {ibm_db.stmt_error(stmt)}"
+    else:
+        rows_affected = ibm_db.num_rows(stmt)
+        message = f"Transaction completed. Number of Affected rows: {ibm_db.num_rows(stmt)}"
+
+
+    return rows_affected, message

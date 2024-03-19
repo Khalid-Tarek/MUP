@@ -84,8 +84,16 @@
         <p><span class="w3-text-grey">Injury Records: </span><span id="modal_text_injury_records">Injury Records</span></p>
       </div>
       <div class="w3-container w3-border-top w3-padding-16 w3-light-grey w3-xlarge w3-center">
-        <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
-        <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Delete</button>
+        <form id="edit_form" action="" method="post" style="display: inline-block;">
+          <input type="text" name="type" id="edit_form_text_type" style="display: none;">
+          <input type="text" name="id" id="edit_form_text_id" style="display: none;">
+          <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
+        </form>
+        <form id="delete_form" action="/delete" method="post" style="display: inline-block;">
+          <input type="text" name="type" id="delete_form_text_type" style="display: none;">
+          <input type="text" name="id" id="delete_form_text_id" style="display: none;">
+          <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Delete</button>
+        </form>
       </div>
 
     </div>
@@ -104,7 +112,7 @@
       </tr>
       
       {% for id, dict in database_tables['SOLDIER']['dictionaries'].items() %}
-        <tr onclick="onClick(this, '{{id}}', 'SOLDIER' )" >
+        <tr onclick="onClick(this, 'SOLDIER', '{{id}}' )" >
           {% for key, value in dict.items() %}
             <td class="table-body"> {{value | replace('_', ' ') }} </td>
           {% endfor %}
@@ -127,7 +135,7 @@
       </tr>
       
       {% for id, dict in database_tables['OFFICER']['dictionaries'].items() %}
-        <tr onclick="onClick(this, '{{id}}', 'OFFICER' )">
+        <tr onclick="onClick(this, 'OFFICER', '{{id}}' )">
           {% for key, value in dict.items() %}
             <td class="table-body"> {{value | replace('_', ' ')}} </td>
           {% endfor %}
@@ -141,7 +149,7 @@
 </div>
 
 <!-- W3.CSS Container -->
-<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
+<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px; padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
 
 <script>
 var database_tables = JSON.parse('{{ database_tables | tojson | safe}}');
@@ -168,7 +176,7 @@ function w3_close() {
 }
 
 // Modal Creation
-function onClick(element, id, type) {
+function onClick(element, type, id) {
   document.getElementById("image").src = null;
   document.getElementById("image").alt = "Selected " + (type == 'SOLDIER' ? 'Soldier' : 'Officer') + "'s Image";
   document.getElementById("modal01").style.display = "block";
@@ -196,8 +204,8 @@ function onClick(element, id, type) {
   }
   
   //Add function to the buttons to redirect to the pages with the appropriate person
-  document.getElementById("edit_button").setAttribute('onclick', 'redirect_to_edit(id, type)');
-  document.getElementById("delete_button").setAttribute('onclick', 'delete_person(id, type)');
+  document.getElementById("edit_button").addEventListener('click', function(){ redirect_to_edit(this, type, id); });
+  document.getElementById("delete_button").addEventListener('click', function(){ delete_person(this, type, id); });
 }
 
 // Helper function to populate basic labels and information per selected person and their appropraite attributes
@@ -301,13 +309,17 @@ function beautify_text(str) {
   return str;
 }
 
-function redirect_to_edit(id, type) {
+function redirect_to_edit(element, type, id) {
   // TODO
   return
 }
 
-function delete_person(id, type) {
+function delete_person(element, type, id) {
   // TODO
+  document.getElementById("delete_form_text_type").value = type;
+  document.getElementById("delete_form_text_id").value = id;
+
+  document.getElementById("delete_form").submit();
   return
 }
 </script>
