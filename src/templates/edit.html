@@ -59,7 +59,7 @@
         <table class="w3-table" style="text-wrap: nowrap;">
             <tr>
                 <td class="w3-right-align"><label for="person_id" id="person_id_label">ID: </label></td>
-                <td><input type="number" name="person_id" id="person_id"></td>
+                <td><input type="number" name="person_id" id="person_id" readonly></td>
                 <td class="w3-right-align"><label for="person_role" id="person_role_label">Role: </label></td>
                 <td><input list="roles_list" name="person_role" id="person_role"><datalist id="roles_list"></datalist></td>
             </tr>
@@ -180,6 +180,14 @@ if(type == 'SOLDIER'){
 
     ed_or_yos_text.setAttribute('type', 'date');
     calculate_end_date();
+
+    role_text.addEventListener('change', function(){
+        check_with_officer_visibility()
+    });
+    ed_or_yos_text.addEventListener('change', function(){
+        calculate_end_date()
+    });
+
 }
 else {
     ed_or_yos_label.innerHTML = 'Years of Service: ';
@@ -193,6 +201,10 @@ else {
     group_gun_text.value = person['GUN_NUM'];
 
     calculate_yos();
+
+    ed_or_yos_text.addEventListener('change', function(){
+        calculate_yos();
+    });
 }
 
 function populate_lists() {
@@ -227,11 +239,11 @@ function populate_lists() {
 function check_with_officer_visibility(){
     if (role_text.value == 'WITH_OFFICER' || role_text.value == 'WITH_OFFICER_DRIVER') {
         soldier_officer_container.style.display = 'block';
-        soldiers_officer_text.value = associates['my_officer'][0] + '. ' + associates['my_officer'][1];
+        soldiers_officer_text.value = associates['my_officer'][0][0] + '. ' + associates['my_officer'][0][1];
     }
     else {
         soldier_officer_container.style.display = 'none';
-        soldiers_officer_text.value = '';
+        soldiers_officer_text.value = '-1';
     }
 }
 
@@ -256,7 +268,7 @@ function calculate_yos(){
 }
 
 function validate_form() {
-
+    
 }
 
 </script>

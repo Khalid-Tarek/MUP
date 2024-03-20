@@ -4,6 +4,7 @@
 <title>Military Unit Personnel</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
 <style>
@@ -52,10 +53,10 @@
   
   <!-- Modal for Full Details -->
   <div id="modal01" class="w3-modal w3-transparent-black">
-    <span class="w3-button w3-transparent w3-xxlarge w3-display-topright" onclick="this.parentNode.style.display='none'">x</span>
+    <span class="w3-button w3-transparent w3-xxlarge w3-display-topright" id="modal_close_button" onclick="this.parentNode.style.display='none'">x</span>
     <div class="w3-modal-content w3-animate-zoom w3-large" style="width: 800px">
       <div class="w3-container w3-padding-32 w3-center">
-        <img src="#" id="image" style="border: 1px solid gray;" />
+        <img src="#" id="image" style="border: 1px solid gray; max-height:200px; max-width:200px; height: auto; width: auto;" />
       </div>
       <div class="w3-container w3-text-black" style="padding-bottom: 16px;">
         <div class="w3-container w3-left">
@@ -78,7 +79,7 @@
         <p><span class="w3-text-grey">Telephone: </span><span class="w3-large" id="modal_text_telephones"></span></p>
       </div>
       <div class="w3-container w3-border-top w3-padding-8"  id="modal_container_officer_soldiers">
-        <p><span class="w3-text-grey" id="modal_label_officer_soldiers">Officer Soldiers: </span><span id="modal_text_officer_soldiers"></span></p>
+        <p><span class="w3-text-grey" id="modal_label_officer_soldiers">Soldiers: </span><span id="modal_text_officer_soldiers"></span></p>
       </div>
       <div class="w3-container w3-border-top w3-padding-16" id="modal_container_injury_records">
         <p><span class="w3-text-grey">Injury Records: </span><span id="modal_text_injury_records">Injury Records</span></p>
@@ -173,9 +174,10 @@ function w3_close() {
 
 // Modal Creation
 function onClick(element, type, id) {
-  document.getElementById("image").src = null;
+  document.getElementById("image").src = type == 'SOLDIER' ? 'https://imgur.com/joJtF7I.jpeg' : 'https://imgur.com/sxXuZ7E.jpeg';
   document.getElementById("image").alt = "Selected " + (type == 'SOLDIER' ? 'Soldier' : 'Officer') + "'s Image";
   document.getElementById("modal01").style.display = "block";
+  var close_button = document.getElementById("modal_close_button");
 
   // Select from the appropriate dictionary according to type passed
   var selected_person = type == 'SOLDIER' ? soldier_dictionaries[id] : officer_dictionaries[id];
@@ -253,18 +255,22 @@ function populate_officer_soldiers_container(selected_person, type) {
     }
   }
   else {
-    officer_soldiers_container.style.display = 'block';
-    officer_soldiers_label.innerHTML = 'Soldiers: ';
-    
-    ids_of_soldiers_with_officer = officer_soldiers_dictionary[selected_person['MILITARY_ID']];
+    if(selected_person['MILITARY_ID'] in officer_soldiers_dictionary) {
+      officer_soldiers_container.style.display = 'block';
+      officer_soldiers_label.innerHTML = 'Soldiers: ';
+      
+      ids_of_soldiers_with_officer = officer_soldiers_dictionary[selected_person['MILITARY_ID']];      
 
-    soldiers_string = '';
-    for (var i = 0; i < ids_of_soldiers_with_officer.length; i++) {
-      soldier = soldier_dictionaries[ids_of_soldiers_with_officer[i]];
-      soldiers_string += '<br/>' + (i + 1) + '. ' + soldier['NAME'] + ' ( ID: ' + soldier['MILITARY_ID'] + ' | End Date: ' + soldier['END_DATE'] + ' )';
+      soldiers_string = '';
+      for (var i = 0; i < ids_of_soldiers_with_officer.length; i++) {
+        soldier = soldier_dictionaries[ids_of_soldiers_with_officer[i]];
+        soldiers_string += '<br/>' + (i + 1) + '. ' + soldier['NAME'] + ' ( ID: ' + soldier['MILITARY_ID'] + ' | End Date: ' + soldier['END_DATE'] + ' )';
+      }
+
+      officer_soldiers_text.innerHTML = soldiers_string;
     }
-
-    officer_soldiers_text.innerHTML = soldiers_string;
+    else 
+      officer_soldiers_container.style.display = 'none';
   }
 }
 

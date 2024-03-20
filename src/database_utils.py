@@ -128,15 +128,6 @@ def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[S
 
     return dictionary
 
-# Queries the database to select a list of columns (all by default) using the entity name, column name and the value we're looking for
-# Make sure to engulf string values with escaped quotes
-def select_as_dict(conn: IBM_DBStatement, entity_name: str, colname: str, where_value: str | Any, selections: list[str] = ['*']) -> dict[str, dict[str, Any]]:
-
-    stmt = ibm_db.exec_immediate(conn, f"SELECT {', '.join(str(e) for e in selections)} FROM {entity_name} WHERE {colname} = {where_value}")
-    table_rows: list[list[Any | str]] = parse_db2_statement(stmt)
-    table_dict: dict[str, dict[str, Any]] = rows_to_dict(table_rows, entity_name)
-
-    return table_dict
 
 # Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations (dictionaries: {'attribute': value}) of all the rows
 def get_table_as_dict(conn: IBM_DBConnection, name: str) -> Tuple[list[str], dict[str, dict[str, Any]]]:
@@ -180,24 +171,7 @@ def get_database_tables_as_dict(conn: IBM_DBConnection):
 
 """
 
-# Deletes the passed person according to type and id
-def delete_person(conn: IBM_DBConnection, type: str, id: int) -> Tuple[int, str]:
-    
-    rows_affected = -1
-    message = ''
-
-    try:
-        stmt = ibm_db.exec_immediate(conn, f'DELETE FROM {type} WHERE military_id = {id}')
-    except:
-        message = f"Transaction couldn't be completed: {ibm_db.stmt_error(stmt)}"
-    else:
-        rows_affected = ibm_db.num_rows(stmt)
-        message = f"Transaction completed. Number of Affected rows: {ibm_db.num_rows(stmt)}"
-
-
-    return rows_affected, message
-
-# A helper function to get the id and name of the officer this soldier is assigned to
+# Get the id and name of the officer this soldier is assigned to
 def get_soldiers_officer(conn: IBM_DBConnection, soldier_id: int = -1):
 
     stmt = ibm_db.exec_immediate(conn, 
@@ -208,3 +182,90 @@ def get_soldiers_officer(conn: IBM_DBConnection, soldier_id: int = -1):
                                  f'WHERE officer_soldier.soldier_military_id = {soldier_id}')
 
     return parse_db2_statement(stmt)
+
+# Inserts an entity into the table with the name entity_name
+def insert_query(conn: IBM_DBConnection, entity_name: str, entity: dict[str, Any]) -> Tuple[int, str]:
+    
+    column_names = ", ".join(entity.keys())
+
+    # Engulf non integers in escaped quotes for sql query building
+    values = ", ".join((f'{value}' if isinstance(value, int) else f'\'{value}\'') for value in entity.values())
+
+    print(column_names, values)
+
+    try:
+        stmt = ibm_db.exec_immediate(conn, f'INSERT INTO {entity_name} ({column_names}) VALUES ({values})')
+    except Exception as e:
+        message = f"Insert Query couldn't be completed: {e}"
+    else:
+        rows_affected = ibm_db.num_rows(stmt)
+        message = f"Insert Query completed. Number of Affected rows: {ibm_db.num_rows(stmt)}"
+
+    return rows_affected, message
+
+# Queries the database to select a list of columns (all by default) using the entity name, column name and the value we're looking for
+# Make sure to engulf string values with escaped quotes
+def select_as_dict(conn: IBM_DBStatement, entity_name: str, colname: str, where_value: str | Any, selections: list[str] = ['*']) -> dict[str, dict[str, Any]]:
+
+    stmt = ibm_db.exec_immediate(conn, f"SELECT {', '.join(str(e) for e in selections)} FROM {entity_name} WHERE {colname} = {where_value}")
+    table_rows: list[list[Any | str]] = parse_db2_statement(stmt)
+    table_dict: dict[str, dict[str, Any]] = rows_to_dict(table_rows, entity_name)
+
+    return table_dict
+
+# Update the entitity passed through a dictionary of it's values and its entity_name (table_name)
+def update_query(conn: IBM_DBConnection, entity_name: str, entity: dict[str, Any]) -> Tuple[int, str]:
+    rows_affected = -1
+    message = ''
+
+    set_value_strings = ''
+    
+    if entity_name ==  'SOLDIER':
+        # Delete all soldier telephones
+        delete_query(conn, 'TELEPHONE', 'MILITARY_ID', entity['MILITARY_ID'])
+
+        # Insert new teleophones, then pop telephones key
+        for telephone in entity['telephones']:
+            insert_query(conn, 'TELEPHONE', {'MILITARY_ID': entity['MILITARY_ID'], 'TELEPHONE': telephone})
+        entity.pop('telephones')
+
+        # Delete the soldier's officer if the relationship eixsts and if it does, insert a new relationship in OFFICER_SOLDIER, then pop officer_id key
+        delete_query(conn, 'OFFICER_SOLDIER', 'SOLDIER_MILITARY_ID', entity['MILITARY_ID'])
+        if entity['ROLE'] == 'WITH_OFFICER' or entity['ROLE'] == 'WITH_OFFICER_DRIVER':
+            insert_query(conn, 'OFFICER_SOLDIER', {'SOLDIER_MILITARY_ID' : entity['MILITARY_ID'], 'OFFICER_MILITARY_ID': entity['officer_id']})
+        entity.pop('officer_id')
+
+    # Construct the set values string from the entity columns and values
+    set_value_strings = []
+    for key in entity:
+        value = f'{entity[key]}'
+        if not isinstance(entity[key], int):
+            value = f'\'{value}\''
+        set_value_strings.append(f'{key} = {value}')
+    set_value_final_string = ", ".join(set_value_strings)
+            
+    try:
+        stmt = ibm_db.exec_immediate(conn, f'UPDATE {entity_name} SET {set_value_final_string} WHERE {PRIMARY_KEYS[entity_name]} = {entity[PRIMARY_KEYS[entity_name]]}')
+    except Exception as e:
+        message = f"Update Query couldn't be completed: {e}"
+    else:
+        rows_affected = ibm_db.num_rows(stmt)
+        message = f"Update Query completed. Number of Affected rows: {ibm_db.num_rows(stmt)}"
+
+    return rows_affected, message
+
+# Deletes the records from the given entity using the passed column and value
+# Make sure to engulf string values with escaped quotes
+def delete_query(conn: IBM_DBConnection, entity_name: str, colname: str, value: str | Any) -> Tuple[int, str]:
+    rows_affected = -1
+    message = ''
+
+    try:
+        stmt = ibm_db.exec_immediate(conn, f'DELETE FROM {entity_name} WHERE {colname} = {value}')
+    except Exception as e:
+        message = f"Delete Query couldn't be completed: {e}"
+    else:
+        rows_affected = ibm_db.num_rows(stmt)
+        message = f"Delete Query completed. Number of Affected rows: {ibm_db.num_rows(stmt)}"
+
+    return rows_affected, message
