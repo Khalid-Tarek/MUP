@@ -84,11 +84,7 @@
         <p><span class="w3-text-grey">Injury Records: </span><span id="modal_text_injury_records">Injury Records</span></p>
       </div>
       <div class="w3-container w3-border-top w3-padding-16 w3-light-grey w3-xlarge w3-center">
-        <form id="edit_form" action="" method="post" style="display: inline-block;">
-          <input type="text" name="type" id="edit_form_text_type" style="display: none;">
-          <input type="text" name="id" id="edit_form_text_id" style="display: none;">
-          <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
-        </form>
+        <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
         <form id="delete_form" action="/delete" method="post" style="display: inline-block;">
           <input type="text" name="type" id="delete_form_text_type" style="display: none;">
           <input type="text" name="id" id="delete_form_text_id" style="display: none;">
@@ -203,8 +199,8 @@ function onClick(element, type, id) {
     populate_officer_soldiers_container(selected_person, type);
   }
   
-  //Add function to the buttons to redirect to the pages with the appropriate person
-  document.getElementById("edit_button").addEventListener('click', function(){ redirect_to_edit(this, type, id); });
+  //Add functionality to the buttons to redirect to the pages with the appropriate person
+  document.getElementById("edit_button").addEventListener('click', function(){ location.href='{{BASE_LINK}}/edit/' + type + '/' + id; });
   document.getElementById("delete_button").addEventListener('click', function(){ delete_person(this, type, id); });
 }
 
@@ -307,11 +303,6 @@ function beautify_text(str) {
   str = str.replace('_', ' ');
 
   return str;
-}
-
-function redirect_to_edit(element, type, id) {
-  // TODO
-  return
 }
 
 function delete_person(element, type, id) {

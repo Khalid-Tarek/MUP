@@ -20,6 +20,14 @@ connection_string = (
     f"PWD={DB2['database_password']};"
 )
 TABLE_NAMES = ['SOLDIER', 'TELEPHONE', 'OFFICER', 'INJURY_RECORD', 'OFFICER_SOLDIER', 'REPORT']
+PRIMARY_KEYS = {
+    'SOLDIER': 'MILITARY_ID',
+    'TELEPHONE': 'TELEPHONE',
+    'OFFICER': 'MILITARY_ID',
+    'INJURY_RECORD': 'INJURY_RECORD_ID',
+    'OFFICER_SOLDIER': 'SOLDIER_MILITARY_ID',
+    'REPORT': 'LINK'
+}
 
 # A helper function to start and return a db2 connection
 # Make sure to close the db connection on exit
@@ -120,8 +128,18 @@ def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[S
 
     return dictionary
 
+# Queries the database to select a list of columns (all by default) using the entity name, column name and the value we're looking for
+# Make sure to engulf string values with escaped quotes
+def select_as_dict(conn: IBM_DBStatement, entity_name: str, colname: str, where_value: str | Any, selections: list[str] = ['*']) -> dict[str, dict[str, Any]]:
+
+    stmt = ibm_db.exec_immediate(conn, f"SELECT {', '.join(str(e) for e in selections)} FROM {entity_name} WHERE {colname} = {where_value}")
+    table_rows: list[list[Any | str]] = parse_db2_statement(stmt)
+    table_dict: dict[str, dict[str, Any]] = rows_to_dict(table_rows, entity_name)
+
+    return table_dict
+
 # Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations (dictionaries: {'attribute': value}) of all the rows
-def get_table_as_dict(conn: IBM_DBConnection, name) -> Tuple[list[str], dict[str, dict[str, Any]]]:
+def get_table_as_dict(conn: IBM_DBConnection, name: str) -> Tuple[list[str], dict[str, dict[str, Any]]]:
     
     # Get table headers and replace underscores in the header names to spaces
     stmt = ibm_db.exec_immediate(conn, f"SELECT colname FROM syscat.columns WHERE TABNAME = '{name}' ORDER BY COLNO")
@@ -162,6 +180,7 @@ def get_database_tables_as_dict(conn: IBM_DBConnection):
 
 """
 
+# Deletes the passed person according to type and id
 def delete_person(conn: IBM_DBConnection, type: str, id: int) -> Tuple[int, str]:
     
     rows_affected = -1
@@ -177,3 +196,15 @@ def delete_person(conn: IBM_DBConnection, type: str, id: int) -> Tuple[int, str]
 
 
     return rows_affected, message
+
+# A helper function to get the id and name of the officer this soldier is assigned to
+def get_soldiers_officer(conn: IBM_DBConnection, soldier_id: int = -1):
+
+    stmt = ibm_db.exec_immediate(conn, 
+                                 f'SELECT officer.military_id, officer.name ' 
+                                 f'FROM officer ' 
+                                 f'INNER JOIN officer_soldier '
+                                 f'ON officer.military_id = officer_soldier.officer_military_id '
+                                 f'WHERE officer_soldier.soldier_military_id = {soldier_id}')
+
+    return parse_db2_statement(stmt)

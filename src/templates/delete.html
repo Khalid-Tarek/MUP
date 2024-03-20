@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Delete Personnel</title>
+<title>Delete Person</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -51,8 +51,13 @@
   </div>
 
   <div class="w3-container w3-display-middle w3-center">
-      <h1 class="w3-xxxlarge w3-text-red"><b>Deleted Personnel Successfully!</b></h1>
-      <button class="w3-button w3-red w3-ripple w3-round-large w3-xxlarge" type="button" onclick="location.href='{{BASE_LINK}}'">Return Home</button>
+    {% if result[0] <= 0 %}
+      <h1 class="w3-xxxlarge w3-text-red"><b>Deleting Person Failed!</b></h1>
+      <h2 class="w3-xlarge w3-text-black">Failure message: {{result[1]}} </h2>
+    {% else %}
+      <h1 class="w3-xxxlarge w3-text-red"><b>Deleted Person Successfully!</b></h1>
+    {% endif %}
+    <button class="w3-button w3-red w3-ripple w3-round-large w3-xxlarge" type="button" onclick="location.href='{{BASE_LINK}}'">Return Home</button>
   </div>
 
 
