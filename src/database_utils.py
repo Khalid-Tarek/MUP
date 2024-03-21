@@ -154,7 +154,6 @@ def get_database_tables_as_dict(conn: IBM_DBConnection):
         database_tables[table_name] = table
 
     return database_tables
-
 """ Final structure for the above function:  
     database_tables = {
                        'table_0': {
@@ -171,7 +170,7 @@ def get_database_tables_as_dict(conn: IBM_DBConnection):
 
 """
 
-# Get the id and name of the officer this soldier is assigned to
+# A join query Get the id and name of the officer this soldier is assigned to
 def get_soldiers_officer(conn: IBM_DBConnection, soldier_id: int = -1):
 
     stmt = ibm_db.exec_immediate(conn, 
@@ -190,8 +189,6 @@ def insert_query(conn: IBM_DBConnection, entity_name: str, entity: dict[str, Any
 
     # Engulf non integers in escaped quotes for sql query building
     values = ", ".join((f'{value}' if isinstance(value, int) else f'\'{value}\'') for value in entity.values())
-
-    print(column_names, values)
 
     try:
         stmt = ibm_db.exec_immediate(conn, f'INSERT INTO {entity_name} ({column_names}) VALUES ({values})')
@@ -221,10 +218,8 @@ def update_query(conn: IBM_DBConnection, entity_name: str, entity: dict[str, Any
     set_value_strings = ''
     
     if entity_name ==  'SOLDIER':
-        # Delete all soldier telephones
+        # Delete all soldier telephones then insert new teleophones, then pop telephones key
         delete_query(conn, 'TELEPHONE', 'MILITARY_ID', entity['MILITARY_ID'])
-
-        # Insert new teleophones, then pop telephones key
         for telephone in entity['telephones']:
             insert_query(conn, 'TELEPHONE', {'MILITARY_ID': entity['MILITARY_ID'], 'TELEPHONE': telephone})
         entity.pop('telephones')

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Edit Person</title>
+<title>Edit Personnel</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -28,11 +28,11 @@
   </div>
   <div class="w3-bar-block">
     <a href="{{BASE_LINK}}" onclick="w3_close()" class="w3-bar-item w3-button w3-white">Home</a> 
-    <a href="{{BASE_LINK}}/add/" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add Personnel</a> 
-    <a href="{{BASE_LINK}}/injury/" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Record Injury</a> 
-    <a href="{{BASE_LINK}}/presence/" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Presence</a> 
-    <a href="{{BASE_LINK}}/reports/" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Reports</a> 
-    <a href="{{BASE_LINK}}/settings/" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Settings</a>
+    <a href="{{BASE_LINK}}/add" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add Personnel</a> 
+    <a href="{{BASE_LINK}}/injury" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Record Injury</a> 
+    <a href="{{BASE_LINK}}/presence" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Presence</a> 
+    <a href="{{BASE_LINK}}/reports" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Reports</a> 
+    <a href="{{BASE_LINK}}/settings" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Settings</a>
   </div>
 </nav>
 
@@ -104,7 +104,7 @@
             </div>
             <div class="w3-container w3-padding-16 w3-left-align" id="soldiers_officer_container">
                 <label for="soldier_officer" id="soldier_officer_label" style="padding-right: 4px;">With Officer:</label>
-                <input list="officer_ids_list" name="soldier_officer" id="soldier_officer"><datalist id="officer_ids_list"></datalist>
+                <input list="officer_ids_list" name="soldier_officer" id="soldier_officer" value="-1"><datalist id="officer_ids_list"></datalist>
             </div>
         </div>
         <input type="submit" value="Submit" class="w3-button w3-red w3-ripple w3-round-large w3-xxlarge">
@@ -184,7 +184,10 @@ if(type == 'SOLDIER'){
     role_text.addEventListener('change', function(){
         check_with_officer_visibility()
     });
-    ed_or_yos_text.addEventListener('change', function(){
+    education_text.addEventListener('change', function(){
+        calculate_end_date()
+    });
+    start_date_text.addEventListener('change', function(){
         calculate_end_date()
     });
 
@@ -202,7 +205,7 @@ else {
 
     calculate_yos();
 
-    ed_or_yos_text.addEventListener('change', function(){
+    start_date_text.addEventListener('change', function(){
         calculate_yos();
     });
 }
@@ -269,6 +272,11 @@ function calculate_yos(){
 
 function validate_form() {
     
+}
+
+function has_no_symbols(str){
+    if(!(str instanceof String)) return true
+    return str != '' && str.match("^[A-Za-z0-9\,\.\s]*$")
 }
 
 </script>

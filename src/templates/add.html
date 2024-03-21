@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Edit Person</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+<style>
+  body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif;}
+  body {font-size:16px;}
+
+  input {width: 300px;}
+
+  .sticky-header-row {position: sticky; top: -1px;}
+
+  .table-header {text-align: center; font-size: 14px;}
+  .table-body {font-size: 13px;}
+</style>
+</head>
+<body>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-red w3-collapse w3-top w3-large w3-padding" style="z-index:3;width:200px;font-weight:bold;" id="mySidebar"><br>
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
+  <div class="w3-container">
+    <h3 class="w3-padding-64"><b>Military<br>Unit Personnel</b></h3>
+  </div>
+  <div class="w3-bar-block">
+    <a href="{{BASE_LINK}}" onclick="w3_close()" class="w3-bar-item w3-button w3-white">Home</a> 
+    <a href="{{BASE_LINK}}/add" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add Personnel</a> 
+    <a href="{{BASE_LINK}}/injury" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Record Injury</a> 
+    <a href="{{BASE_LINK}}/presence" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Presence</a> 
+    <a href="{{BASE_LINK}}/reports" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Reports</a> 
+    <a href="{{BASE_LINK}}/settings" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Settings</a>
+  </div>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
+  <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
+  <span>Military Unit Personnel</span>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:240px;margin-right:40px">
+  
+  <div class="w3-container" style="margin-top:20px">
+    <h1 class="w3-jumbo"><b>{{UNIT_NAME}}</b></h1>
+  </div>
+
+  <div class="w3-container w3-display-middle w3-center">
+      <h1 id="edit_header" class="w3-xxxlarge w3-text-red"><b>Add</b></h1>
+      <hr style="width:100px; border:5px solid red; margin: auto" class="w3-round">
+      <form action="{{BASE_LINK}}/add" method="post" class="w3-large w3-padding-16" onsubmit="return validate_form()">
+        
+        <input style="width: 25px;" type="radio" name="person_type" id="person_type_soldier" value="SOLDIER" onclick="on_radio_button_selected(this)" checked>
+        <label for="person_type_soldier">Soldier</label>
+        <input style="width: 25px;" type="radio" name="person_type" id="person_type_officer" value="OFFICER" onclick="on_radio_button_selected(this)">
+        <label for="person_type_officer">Officer</label>
+        
+        <table class="w3-table" style="text-wrap: nowrap;">
+            <tr>
+                <td class="w3-right-align"><label for="person_id" id="person_id_label">ID: </label></td>
+                <td><input type="number" name="person_id" id="person_id"></td>
+                <td class="w3-right-align"><label for="person_role" id="person_role_label">Role: </label></td>
+                <td><input list="roles_list" name="person_role" id="person_role"><datalist id="roles_list"></datalist></td>
+            </tr>
+            <tr>
+                <td class="w3-right-align"><label for="person_name" id="person_name_label">Name: </label></td>
+                <td><input type="text" name="person_name" id="person_name"></td>
+                <td class="w3-right-align"><label for="person_group_gun" id="person_group_gun_label"></label></td>
+                <td><input type="text" name="person_group_gun" id="person_group_gun"> <datalist id="group_list"></datalist></td>
+            </tr>
+            <tr>
+                <td class="w3-right-align"><label for="person_start_date" id="person_start_date_label">Start Date: </label></td>
+                <td><input type="date" name="person_start_date" id="person_start_date"></td>
+                <td class="w3-right-align"><label for="person_presence" id="person_presence_label"></label></td>
+                <td><input list="presence_list" name="person_presence" id="person_presence"> <datalist id="presence_list"></datalist></td>
+            </tr>
+            <tr>
+                <td class="w3-right-align"><label for="person_ed_or_yos" id="person_ed_or_yos_label"></label></td>
+                <td><input type="text" name="person_ed_or_yos" id="person_ed_or_yos" readonly></td>
+                <td class="w3-right-align"><label for="person_education" id="person_education_label"></label></td>
+                <td><input list="education_list" name="person_education" id="person_education"> <datalist id="education_list"></datalist></td>
+            </tr>
+        </table>
+        <div class="w3-containter w3-cell-row">
+            <div class="w3-cell-bottom w3-padding">Address: </div>
+            <div class="w3-cell w3-padding">
+                <p><label for="person_address_governorate" id="person_address_governorate_label">Governorate: </label></p>
+                <input type="text" name="person_address_governorate" id="person_address_governorate">
+            </div>
+            <div class="w3-cell w3-padding">
+                <p><label for="person_address_town" id="person_address_town_label">Town: </label></p>
+                <input type="text" name="person_address_town" id="person_address_town">
+            </div>
+            <div class="w3-cell w3-padding">
+                <label for="person_address_street" id="person_address_street_label">Street: </label></p>
+                <input type="text" name="person_address_street" id="person_address_street">
+            </div>
+        </div>
+        <div id="soldier_associates_container" class="w3-containter">
+            <div class="w3-container w3-padding-16 w3-left-align" id="telephones_container">
+                <label for="soldier_telephones" id="soldier_telephones_label" style="padding-right: 4px;">Telephones:</label>
+                <input type="text" name="soldier_telephones" id="soldier_telephones" style="width: 750px;">
+            </div>
+            <div class="w3-container w3-padding-16 w3-left-align" id="soldiers_officer_container" style="display: none;">
+                <label for="soldier_officer" id="soldier_officer_label" style="padding-right: 4px;">With Officer:</label>
+                <input list="officer_ids_list" name="soldier_officer" id="soldier_officer" value="-1"><datalist id="officer_ids_list"></datalist>
+            </div>
+        </div>
+        <input type="submit" value="Submit" class="w3-button w3-red w3-ripple w3-round-large w3-xxlarge">
+      </form>
+  </div>
+
+
+<!-- End page content -->
+</div>
+
+<!-- W3.CSS Container -->
+<div class="w3-light-grey w3-container w3-padding-32 w3-display-bottommiddle" style="margin-top:75px;padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
+
+<script>
+var associates = JSON.parse('{{associates | tojson | safe}}');
+
+console.log(associates);
+
+var roles_list = document.getElementById('roles_list');
+var groups_list = document.getElementById('group_list');
+var presence_list = document.getElementById('presence_list');
+var education_list = document.getElementById('education_list');
+var officer_ids_list = document.getElementById('officer_ids_list');
+
+var soldier_associates_container = document.getElementById('soldier_associates_container');
+var soldier_officer_container = document.getElementById('soldiers_officer_container');
+
+var group_gun_label = document.getElementById('person_group_gun_label');
+var presence_label = document.getElementById('person_presence_label');
+var ed_or_yos_label = document.getElementById('person_ed_or_yos_label');
+var education_label = document.getElementById('person_education_label');
+
+var id_text = document.getElementById('person_id');
+var name_text = document.getElementById('person_name');
+var start_date_text = document.getElementById('person_start_date');
+var ed_or_yos_text = document.getElementById('person_ed_or_yos');
+var role_text = document.getElementById('person_role');
+var group_gun_text = document.getElementById('person_group_gun');
+var presence_text = document.getElementById('person_presence');
+var education_text = document.getElementById('person_education');
+var governorate_text = document.getElementById('person_address_governorate');
+var town_text = document.getElementById('person_address_town');
+var street_text = document.getElementById('person_address_street');
+var telephones_text = document.getElementById('soldier_telephones');
+var soldiers_officer_text = document.getElementById('soldier_officer');
+
+populate_lists();
+document.getElementById('person_type_soldier').click();
+
+function on_radio_button_selected(radio_button) {
+    if(radio_button.value == 'SOLDIER'){
+        ed_or_yos_label.innerHTML = 'End Date: ';
+        group_gun_label.innerHTML = 'Group: ';
+        presence_label.innerHTML = 'Presence: ';
+        education_label.innerHTML = 'Education: ';
+        
+        presence_label.style.display = 'block';
+        education_label.style.display = 'block';
+        presence_text.style.display = 'block';
+        education_text.style.display = 'block';
+        soldier_associates_container.style.display = 'block';
+
+        group_gun_text.removeAttribute('type');
+        group_gun_text.setAttribute('list', 'group_list')
+    
+        ed_or_yos_text.setAttribute('type', 'date');
+    
+        check_with_officer_visibility()
+
+        role_text.addEventListener('change', function(){
+            check_with_officer_visibility()
+        });
+        education_text.addEventListener('change', function(){
+            calculate_end_date()
+        });
+        start_date_text.addEventListener('change', function(){
+            calculate_end_date()
+        });
+
+        roles_list.innerHTML = '';
+        associates['soldiers_roles_list'].forEach(function(item){
+            var option = document.createElement('option');
+            option.value = item;
+            roles_list.append(option);
+        });
+    
+    }
+    else {
+        ed_or_yos_label.innerHTML = 'Years of Service: ';
+        group_gun_label.innerHTML = 'Gun Number: ';
+        presence_label.style.display = 'none';
+        education_label.style.display = 'none';
+        presence_text.style.display = 'none';
+        education_text.style.display = 'none';
+        soldier_associates_container.style.display = 'none';
+    
+        group_gun_text.removeAttribute('list');
+        group_gun_text.setAttribute('type', 'text');
+    
+        ed_or_yos_text.setAttribute('type', 'number');
+
+        start_date_text.addEventListener('change', function(){
+            calculate_yos();
+        });
+
+        roles_list.innerHTML = '';
+        associates['officers_roles_list'].forEach(function(item){
+            var option = document.createElement('option');
+            option.value = item;
+            roles_list.append(option);
+        });
+    }
+}
+
+function populate_lists() {
+    associates['soldiers_roles_list'].forEach(function(item){
+        var option = document.createElement('option');
+        option.value = item;
+        roles_list.append(option);
+    });
+    Object.keys(associates['education_list']).forEach(function(item){
+        var option = document.createElement('option');
+        option.value = item;
+        education_list.append(option);
+    });
+    associates['group_num_list'].forEach(function(item){
+        var option = document.createElement('option');
+        option.value = String(item);
+        groups_list.append(option);
+    });
+    associates['presence_list'].forEach(function(item){
+        var option = document.createElement('option');
+        option.value = item;
+        presence_list.append(option);
+    });
+    Object.values(associates['all_officers']).forEach(function(item){
+        var option = document.createElement('option');
+        option.value = item['MILITARY_ID'] + '. ' + item['NAME'];
+        officer_ids_list.append(option);
+    });
+}
+
+function check_with_officer_visibility(){
+    if (role_text.value == 'WITH_OFFICER' || role_text.value == 'WITH_OFFICER_DRIVER') {
+        soldier_officer_container.style.display = 'block';
+        soldiers_officer_text.value = '-1';
+    }
+    else {
+        soldier_officer_container.style.display = 'none';
+        soldiers_officer_text.value = '-1';
+    }
+}
+
+document.getElementById
+
+function calculate_end_date() {
+    start_date = new Date(start_date_text.value);
+    days_of_service = 0;
+    if(education_text.value in associates['education_list'])
+        days_of_service = associates['education_list'][education_text.value];
+
+    end_date = new Date();
+    end_date.setTime(start_date.getTime() + (days_of_service * 24 * 60 * 60 * 1000));
+
+    ed_or_yos_text.value = end_date.toISOString().slice(0, 10);
+}
+
+function calculate_yos(){
+    start_date = new Date(start_date_text.value);
+    dateDiff = new Date(Date.now() - start_date);
+    years = Math.abs(dateDiff.getUTCFullYear() - 1970);
+
+    ed_or_yos_text.value = years;
+}
+
+function validate_form() {
+    
+}
+
+function has_no_symbols(str){
+    if(!(str instanceof String)) return true
+    return str != '' && str.match("^[A-Za-z0-9\,\.\s]*$")
+}
+
+</script>
+
+</body>
+</html>

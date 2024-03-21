@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Injuries</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+<style>
+  body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif;}
+  body {font-size:16px;}
+
+  .sticky-header-row {position: sticky; top: -1px;}
+
+  .table-header {text-align: center; font-size: 14px;}
+  .table-body {font-size: 13px;}
+</style>
+</head>
+<body>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-red w3-collapse w3-top w3-large w3-padding" style="z-index:3;width:200px;font-weight:bold;" id="mySidebar"><br>
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
+  <div class="w3-container">
+    <h3 class="w3-padding-64"><b>Military<br>Unit Personnel</b></h3>
+  </div>
+  <div class="w3-bar-block">
+    <a href="{{BASE_LINK}}" onclick="w3_close()" class="w3-bar-item w3-button w3-white">Home</a> 
+    <a href="{{BASE_LINK}}/add" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Add Personnel</a> 
+    <a href="{{BASE_LINK}}/injury" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Record Injury</a> 
+    <a href="{{BASE_LINK}}/presence" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Presence</a> 
+    <a href="{{BASE_LINK}}/reports" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Reports</a> 
+    <a href="{{BASE_LINK}}/settings" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Settings</a>
+  </div>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
+  <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
+  <span>Military Unit Personnel</span>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:240px;margin-right:40px">
+  
+  <div class="w3-container" style="margin-top:20px">
+    <h1 class="w3-jumbo"><b>{{UNIT_NAME}}</b></h1>
+  </div>
+  
+  <!-- Modal for Full Details -->
+  <div id="modal01" class="w3-modal w3-transparent-black">
+    <span class="w3-button w3-transparent w3-xxlarge w3-display-topright" id="modal_close_button" onclick="this.parentNode.style.display='none'">x</span>
+    <div class="w3-modal-content w3-animate-zoom w3-large" style="width: 800px">
+      <div class="w3-container w3-padding-32 w3-center">
+        <img src="#" id="image" style="border: 1px solid gray; max-height:200px; max-width:200px; height: auto; width: auto;" />
+      </div>
+      <div class="w3-container w3-text-black" style="padding-bottom: 16px;">
+        <div class="w3-container w3-left">
+          <p><span class="w3-text-grey" id="modal_label_0"></span><span id="modal_text_0"></span></p>
+          <p><span class="w3-text-grey" id="modal_label_1"></span><span id="modal_text_1" ></span></p>
+          <p><span class="w3-text-grey" id="modal_label_2"></span><span id="modal_text_2" ></span></p>
+          <p><span class="w3-text-grey" id="modal_label_3"></span><span id="modal_text_3" ></span></p>
+        </div>
+        <div class="w3-container w3-right">
+          <p><span class="w3-text-grey" id="modal_label_4"></span><span id="modal_text_4"></span></p>
+          <p><span class="w3-text-grey" id="modal_label_5"></span><span id="modal_text_5"></span></p>
+          <p><span class="w3-text-grey" id="modal_label_6"></span><span id="modal_text_6"></span></p>
+          <p><span class="w3-text-grey" id="modal_label_7"></span><span id="modal_text_7"></span></p>
+        </div>
+        <div class="w3-container w3-center">
+          <p><span class="w3-text-grey" id="modal_label_8"></span><span id="modal_text_8"></span></p>
+        </div>
+      </div>
+      <div class="w3-container w3-border-top w3-padding-8" id="modal_container_telephones">
+        <p><span class="w3-text-grey">Telephone: </span><span class="w3-large" id="modal_text_telephones"></span></p>
+      </div>
+      <div class="w3-container w3-border-top w3-padding-8"  id="modal_container_officer_soldiers">
+        <p><span class="w3-text-grey" id="modal_label_officer_soldiers">Soldiers: </span><span id="modal_text_officer_soldiers"></span></p>
+      </div>
+      <div class="w3-container w3-border-top w3-padding-16" id="modal_container_injury_records">
+        <p><span class="w3-text-grey">Injury Records: </span><span id="modal_text_injury_records">Injury Records</span></p>
+      </div>
+      <div class="w3-container w3-border-top w3-padding-16 w3-light-grey w3-xlarge w3-center">
+        <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
+        <form id="delete_form" action="/delete" method="post" style="display: inline-block;">
+          <input type="text" name="type" id="delete_form_text_type" style="display: none;">
+          <input type="text" name="id" id="delete_form_text_id" style="display: none;">
+          <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Delete</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Soldiers Table & Header -->
+  <h1 class="w3-xxxlarge w3-text-red"><b>Soldiers</b></h1>
+  <hr style="width:50px;border:5px solid red" class="w3-round">
+  
+  <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
+    <table class="w3-table-all w3-hoverable">
+      <tr class="w3-red sticky-header-row">
+        {% for header in database_tables['SOLDIER']['headers'] %}
+          <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
+        {% endfor %}
+      </tr>
+      
+      {% for id, dict in database_tables['SOLDIER']['dictionaries'].items() %}
+        <tr onclick="onClick(this, 'SOLDIER', '{{id}}' )" >
+          {% for key, value in dict.items() %}
+            <td class="table-body"> {{value | replace('_', ' ') }} </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      
+    </table>
+  </div>
+
+  <!-- Officers Table & Header -->
+  <h1 class="w3-xxxlarge w3-text-red"><b>Officers</b></h1>
+  <hr style="width:50px; border:5px solid red" class="w3-round">
+  
+  <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
+    <table class="w3-table-all w3-hoverable">
+      <tr class="w3-red sticky-header-row">
+        {% for header in database_tables['OFFICER']['headers'] %}
+          <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
+        {% endfor %}
+      </tr>
+      
+      {% for id, dict in database_tables['OFFICER']['dictionaries'].items() %}
+        <tr onclick="onClick(this, 'OFFICER', '{{id}}' )">
+          {% for key, value in dict.items() %}
+            <td class="table-body"> {{value | replace('_', ' ')}} </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  
+
+<!-- End page content -->
+</div>
+
+<!-- W3.CSS Container -->
+<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px; padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
+
+<script>
+var database_tables = JSON.parse('{{ database_tables | tojson | safe}}');
+var soldier_dictionaries = database_tables['SOLDIER']['dictionaries'];
+var officer_dictionaries = database_tables['OFFICER']['dictionaries'];
+var injury_record_dictionaries = database_tables['INJURY_RECORD']['dictionaries'];
+var telephones_dictionary = database_tables['TELEPHONE']['dictionaries'];
+var officer_soldiers_dictionary = database_tables['OFFICER_SOLDIER']['dictionaries']; 
+
+console.log(database_tables);
+
+var soldier_attributes = ["MILITARY_ID", "NAME", "START_DATE", "END_DATE", "ROLE", "GROUP_NUM", "PRESENCE", "EDUCATION", "ADDRESS"];
+var officer_attributes = ["MILITARY_ID", "NAME", "START_DATE", "YEARS_OF_SERVICE", "ROLE", "GUN_NUM", " ", " ", "ADDRESS"];
+
+// Script to open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+// Helper function to make text a little bit more visually appealing
+function beautify_text(str) {
+  str = str.toString();
+  str = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  str = str.replace('_', ' ');
+  str = str.replace('_', ' ');
+
+  return str;
+}
+
+</script>
+
+</body>
+</html>
