@@ -181,18 +181,27 @@ def injury_page():
 
 @app.route('/presence')
 def presence_page():
-    #TODO
-    return 1
+    return render_template(
+        'presence.html',
+        BASE_LINK = BASE_LINK,
+        UNIT_NAME = UNIT_NAME
+    )
 
 @app.route('/reports')
 def reports_page():
-    #TODO
-    return 1
+    return render_template(
+        'reports.html',
+        BASE_LINK = BASE_LINK,
+        UNIT_NAME = UNIT_NAME
+    )
 
 @app.route('/settings')
 def settings_page():
-    #TODO
-    return 1
+    return render_template(
+        'settings.html',
+        BASE_LINK = BASE_LINK,
+        UNIT_NAME = UNIT_NAME
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True, use_reloader=True)
