@@ -51,96 +51,66 @@
     <h1 class="w3-jumbo"><b>{{UNIT_NAME}}</b></h1>
   </div>
   
-  <!-- Modal for Full Details -->
+  <!-- Confirmation Modal for deleting an injury record -->
   <div id="modal01" class="w3-modal w3-transparent-black">
     <span class="w3-button w3-transparent w3-xxlarge w3-display-topright" id="modal_close_button" onclick="this.parentNode.style.display='none'">x</span>
     <div class="w3-modal-content w3-animate-zoom w3-large" style="width: 800px">
-      <div class="w3-container w3-padding-32 w3-center">
-        <img src="#" id="image" style="border: 1px solid gray; max-height:200px; max-width:200px; height: auto; width: auto;" />
-      </div>
       <div class="w3-container w3-text-black" style="padding-bottom: 16px;">
-        <div class="w3-container w3-left">
-          <p><span class="w3-text-grey" id="modal_label_0"></span><span id="modal_text_0"></span></p>
-          <p><span class="w3-text-grey" id="modal_label_1"></span><span id="modal_text_1" ></span></p>
-          <p><span class="w3-text-grey" id="modal_label_2"></span><span id="modal_text_2" ></span></p>
-          <p><span class="w3-text-grey" id="modal_label_3"></span><span id="modal_text_3" ></span></p>
-        </div>
-        <div class="w3-container w3-right">
-          <p><span class="w3-text-grey" id="modal_label_4"></span><span id="modal_text_4"></span></p>
-          <p><span class="w3-text-grey" id="modal_label_5"></span><span id="modal_text_5"></span></p>
-          <p><span class="w3-text-grey" id="modal_label_6"></span><span id="modal_text_6"></span></p>
-          <p><span class="w3-text-grey" id="modal_label_7"></span><span id="modal_text_7"></span></p>
-        </div>
         <div class="w3-container w3-center">
-          <p><span class="w3-text-grey" id="modal_label_8"></span><span id="modal_text_8"></span></p>
+          <p><span class="w3-text-grey"> Are you sure you want to delete this injury record?</span></p>
         </div>
-      </div>
-      <div class="w3-container w3-border-top w3-padding-8" id="modal_container_telephones">
-        <p><span class="w3-text-grey">Telephone: </span><span class="w3-large" id="modal_text_telephones"></span></p>
-      </div>
-      <div class="w3-container w3-border-top w3-padding-8"  id="modal_container_officer_soldiers">
-        <p><span class="w3-text-grey" id="modal_label_officer_soldiers">Soldiers: </span><span id="modal_text_officer_soldiers"></span></p>
-      </div>
-      <div class="w3-container w3-border-top w3-padding-16" id="modal_container_injury_records">
-        <p><span class="w3-text-grey">Injury Records: </span><span id="modal_text_injury_records">Injury Records</span></p>
       </div>
       <div class="w3-container w3-border-top w3-padding-16 w3-light-grey w3-xlarge w3-center">
-        <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
-        <form id="delete_form" action="/delete" method="post" style="display: inline-block;">
-          <input type="text" name="type" id="delete_form_text_type" style="display: none;">
+        <button id="no_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;" onclick="this.parentNode.parentNode.parentNode.style.display='none'">No</button>
+        <form id="delete_form" action="{{BASE_LINK}}/injury" method="post" style="display: inline-block;">
+          <input type="text" name="action" id="delete_form_test_action" style="display: none;" value="delete">
           <input type="text" name="id" id="delete_form_text_id" style="display: none;">
-          <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Delete</button>
+          <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Yes</button>
         </form>
       </div>
-
     </div>
   </div>
 
-  <!-- Soldiers Table & Header -->
-  <h1 class="w3-xxxlarge w3-text-red"><b>Soldiers</b></h1>
+  <!-- Injury Records Table & Header -->
+  <h1 class="w3-xxxlarge w3-text-red"><b>Injury Records</b></h1>
   <hr style="width:50px;border:5px solid red" class="w3-round">
   
   <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
     <table class="w3-table-all w3-hoverable">
       <tr class="w3-red sticky-header-row">
-        {% for header in database_tables['SOLDIER']['headers'] %}
+        {% for header in all_injuries_table['headers'] %}
           <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
         {% endfor %}
       </tr>
       
-      {% for id, dict in database_tables['SOLDIER']['dictionaries'].items() %}
-        <tr onclick="onClick(this, 'SOLDIER', '{{id}}' )" >
+      {% for id, dict in all_injuries_table['dictionaries'].items() %}
+        <tr onclick="onClick(this, '{{id}}' )">
           {% for key, value in dict.items() %}
             <td class="table-body"> {{value | replace('_', ' ') }} </td>
           {% endfor %}
         </tr>
       {% endfor %}
-      
     </table>
   </div>
 
-  <!-- Officers Table & Header -->
-  <h1 class="w3-xxxlarge w3-text-red"><b>Officers</b></h1>
-  <hr style="width:50px; border:5px solid red" class="w3-round">
-  
-  <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
-    <table class="w3-table-all w3-hoverable">
-      <tr class="w3-red sticky-header-row">
-        {% for header in database_tables['OFFICER']['headers'] %}
-          <th class="table-header" style="border: 2px solid white;"> {{header | replace('_', ' ')}} </th>
-        {% endfor %}
-      </tr>
-      
-      {% for id, dict in database_tables['OFFICER']['dictionaries'].items() %}
-        <tr onclick="onClick(this, 'OFFICER', '{{id}}' )">
-          {% for key, value in dict.items() %}
-            <td class="table-body"> {{value | replace('_', ' ')}} </td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
-  
+  <!-- New Injury Record -->
+  <h1 class="w3-xxxlarge w3-text-red" style="margin-top: 32px;"><b>New Injury Record</b></h1>
+  <hr style="width:50px;border:5px solid red" class="w3-round">
+
+  <form class="w3-center" id='new_injury_form' action="{{BASE_LINK}}/injury" method="post">
+    <input type="text" name="action" id="new_injury_form_test_action" style="display: none;" value="add">
+    <p class="w3-padding-16">
+        <label for="injured_soldier_text">Injured Soldier:</label>
+        <input list="soldiers_list" name="injured_soldier" id="injured_soldier"><datalist id="soldiers_list"></datalist>       
+        
+        <label for="injury_date" style="padding-left: 32px;">Injury Date:</label>
+        <input type="date" name="injury_date" id="injury_date">
+        
+        <label for="injury_type" style="padding-left: 32px;">Injury Type:</label>
+        <input list="types_list" name="injury_type" id="injury_type"><datalist id="types_list"></datalist>
+    </p>
+    <input type="submit" value="Submit" class="w3-button w3-red w3-ripple w3-round-large w3-xlarge">
+  </form>
 
 <!-- End page content -->
 </div>
@@ -149,17 +119,25 @@
 <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px; padding-right:58px; width: 100%;"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
 
 <script>
-var database_tables = JSON.parse('{{ database_tables | tojson | safe}}');
-var soldier_dictionaries = database_tables['SOLDIER']['dictionaries'];
-var officer_dictionaries = database_tables['OFFICER']['dictionaries'];
-var injury_record_dictionaries = database_tables['INJURY_RECORD']['dictionaries'];
-var telephones_dictionary = database_tables['TELEPHONE']['dictionaries'];
-var officer_soldiers_dictionary = database_tables['OFFICER_SOLDIER']['dictionaries']; 
+var all_injuries_table = JSON.parse('{{ all_injuries_table | tojson | safe}}');
+var all_soldiers = JSON.parse('{{ all_soldiers | tojson | safe}}');
+var injury_types = JSON.parse('{{ injury_types | tojson | safe}}')
 
-console.log(database_tables);
+console.log(all_injuries_table, all_soldiers, injury_types);
 
-var soldier_attributes = ["MILITARY_ID", "NAME", "START_DATE", "END_DATE", "ROLE", "GROUP_NUM", "PRESENCE", "EDUCATION", "ADDRESS"];
-var officer_attributes = ["MILITARY_ID", "NAME", "START_DATE", "YEARS_OF_SERVICE", "ROLE", "GUN_NUM", " ", " ", "ADDRESS"];
+soldiers_list = document.getElementById("soldiers_list");
+types_list = document.getElementById("types_list");
+
+Object.values(all_soldiers).forEach(function(item){
+    var option = document.createElement('option');
+    option.value = item['MILITARY_ID'] + '. ' + item['NAME'];
+    soldiers_list.append(option);
+});
+injury_types.forEach(function(item){
+    var option = document.createElement('option');
+    option.value = item;
+    types_list.append(option);
+})
 
 // Script to open and close sidebar
 function w3_open() {
@@ -172,14 +150,13 @@ function w3_close() {
   document.getElementById("myOverlay").style.display = "none";
 }
 
-// Helper function to make text a little bit more visually appealing
-function beautify_text(str) {
-  str = str.toString();
-  str = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  str = str.replace('_', ' ');
-  str = str.replace('_', ' ');
+function onClick(element, id){
+    document.getElementById("modal01").style.display = "block";
 
-  return str;
+    document.getElementById('delete_button').addEventListener('click', function(){
+        document.getElementById("delete_form_text_id").value = all_injuries_table['dictionaries'][id]['INJURY_RECORD_ID'];
+        document.getElementById("delete_form").submit();
+    });
 }
 
 </script>

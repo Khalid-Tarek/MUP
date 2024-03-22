@@ -77,7 +77,7 @@ def check_or_create_all_tables(conn: IBM_DBConnection):
             create_table(conn, table_name)
 
 # Creates a dictionary of dictionaries ({military_id: {attr: value}}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
-def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dict[str, Any]]:
+def rows_to_dict(rows: list[list[Any | str]], entity_name: str = '', row_names: list[str] = [], distinctive_row: int = 0) -> dict[str, dict[str, Any]]:
     dictionary = {}
     match entity_name:
         case 'SOLDIER':
@@ -103,7 +103,8 @@ def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dic
                 else:
                     dictionary[str(row[1])] = [str(row[0])]
         case _:
-            pass
+            for i in range(0, len(rows)): 
+                dictionary[str(rows[i][distinctive_row])] = {row_names[index] : element for index, element in enumerate(rows[i])}
 
     return dictionary
 """ For case INJURY_RECORD, TELEPHONE and OFFICER_SOLDIER, their structures are different:
@@ -111,6 +112,10 @@ def rows_to_dict(rows: list[list[Any | str]], entity_name: str) -> dict[str, dic
     INJURY_RECORD:      {'id0' : [injury0, injury1, .....], 'id1' : [injury0, injury1, .....], ...... }        (injury : {attr0: value0, attr1: value1, ..... })
     TELEPHONE:          {'id0': ['telephone0', 'telephone1', ..... ], 'id1': ['telephone0', 'telephone1', ..... ], ..... }
     OFFICER_SOLDIER:    {'officer_id0': ['soldier_id0', 'soldier_id1', ..... ], 'officer_id1': ['soldier_id0', 'soldier_id1', ..... ], ..... }
+
+    For any other case other than the listed tables (for example: Custom Select Queries like Joins),
+    The function will require a list of row names, as well as the index of the row for which the dictionaries
+    could be accessed in the larger dictionary
 """
 
 # [DEPRECATED] Creates a dictionary of objects ({military_id: object}) of the specified entity from the SQL result. Takes a list of rows (List of Lists), and the entity name
@@ -128,7 +133,6 @@ def rows_to_object_dict(rows: list[list[Any | str]], entity_name: str) -> dict[S
 
     return dictionary
 
-
 # Queries the database for the table with the name passed (must be all capital) and returns headers and object represenations (dictionaries: {'attribute': value}) of all the rows
 def get_table_as_dict(conn: IBM_DBConnection, name: str) -> Tuple[list[str], dict[str, dict[str, Any]]]:
     
@@ -144,7 +148,7 @@ def get_table_as_dict(conn: IBM_DBConnection, name: str) -> Tuple[list[str], dic
     return table_headers, table_dict
 
 # Queries the database for all the data in each of it's tables and returns a dictionary of tables (which are dictionaries themselves)
-def get_database_tables_as_dict(conn: IBM_DBConnection):
+def get_database_tables_as_dict(conn: IBM_DBConnection) -> dict[str, Tuple[list[str], dict[str, dict[str, Any]]]]:
     database_tables = {}
 
     for table_name in TABLE_NAMES:
@@ -182,6 +186,23 @@ def get_soldiers_officer(conn: IBM_DBConnection, soldier_id: int = -1):
 
     return parse_db2_statement(stmt)
 
+# A join query to get the injury table as well as the name of the soldier that has the injury
+def get_all_injuries_with_soldiers(conn: IBM_DBConnection) -> Tuple[list[str], dict[str, dict[str, Any]]]:
+    table_headers = ['INJURY_RECORD_ID', 'MILITARY_ID', 'NAME', 'DATE', 'TYPE']
+
+    stmt = ibm_db.exec_immediate(conn, 'SELECT INJURY_RECORD.INJURY_RECORD_ID, ' + 
+                                              'INJURY_RECORD.MILITARY_ID, ' +
+                                              'SOLDIER.NAME, ' +
+                                              'INJURY_RECORD.DATE, ' + 
+                                              'INJURY_RECORD.TYPE ' + 
+                                              'FROM INJURY_RECORD JOIN SOLDIER ' +
+                                              'ON INJURY_RECORD.MILITARY_ID = SOLDIER.MILITARY_ID ' +
+                                              'ORDER BY INJURY_RECORD.INJURY_RECORD_ID')
+    table_rows: list[list[str | Any]] = parse_db2_statement(stmt)
+    table_dicts: dict[str, dict] = rows_to_dict(table_rows, row_names = table_headers)
+
+    return table_headers, table_dicts
+    
 # Inserts an entity into the table with the name entity_name
 def insert_query(conn: IBM_DBConnection, entity_name: str, entity: dict[str, Any]) -> Tuple[int, str]:
     

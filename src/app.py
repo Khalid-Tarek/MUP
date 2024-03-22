@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, abort
-from entities import officer, soldier
+from entities import officer, soldier, injury_record
 from my_utils import PORT, BASE_LINK, UNIT_NAME
 import database_utils
 import atexit
@@ -148,10 +148,36 @@ def add_page():
         associates = associates
     )
 
-@app.route('/injury')
+@app.route('/injury', methods=['POST', 'GET'])
 def injury_page():
-    #TODO
-    return 1
+
+    if request.method == 'POST':
+        if request.form['action'] == 'delete':
+            print(request.form['id'])
+            database_utils.delete_query(conn, 'INJURY_RECORD', database_utils.PRIMARY_KEYS['INJURY_RECORD'], int(request.form['id']))
+        elif request.form['action'] == 'add':
+            entity = {
+                'MILITARY_ID': int(request.form['injured_soldier'].split('.')[0]),
+                'DATE': request.form['injury_date'],
+                'TYPE': request.form['injury_type']
+            }
+            
+            print(entity)
+            database_utils.insert_query(conn, 'INJURY_RECORD', entity)
+        
+    all_injuries_table = {}
+    all_injuries_table['headers'], all_injuries_table['dictionaries'] = database_utils.get_all_injuries_with_soldiers(conn)
+    all_soldiers = database_utils.get_table_as_dict(conn, 'SOLDIER')[1]
+    injury_types = [e.name for e in injury_record.Type]
+
+    return render_template(
+        'injury.html',
+        BASE_LINK = BASE_LINK,
+        UNIT_NAME = UNIT_NAME,
+        all_injuries_table = all_injuries_table,
+        all_soldiers = all_soldiers,
+        injury_types = injury_types
+    )
 
 @app.route('/presence')
 def presence_page():

@@ -86,7 +86,7 @@
       </div>
       <div class="w3-container w3-border-top w3-padding-16 w3-light-grey w3-xlarge w3-center">
         <button id="edit_button" type="button" class="w3-button w3-red w3-ripple w3-round-large" style="margin-right: 24px;">Edit</button>
-        <form id="delete_form" action="/delete" method="post" style="display: inline-block;">
+        <form id="delete_form" action="{{BASE_LINK}}/delete" method="post" style="display: inline-block;">
           <input type="text" name="type" id="delete_form_text_type" style="display: none;">
           <input type="text" name="id" id="delete_form_text_id" style="display: none;">
           <button id="delete_button" type="button" class="w3-button w3-red w3-ripple w3-round-large">Delete</button>
@@ -120,7 +120,7 @@
   </div>
 
   <!-- Officers Table & Header -->
-  <h1 class="w3-xxxlarge w3-text-red"><b>Officers</b></h1>
+  <h1 class="w3-xxxlarge w3-text-red" style="margin-top: 32px;"><b>Officers</b></h1>
   <hr style="width:50px; border:5px solid red" class="w3-round">
   
   <div class="w3-responsive" style="max-height: 400px; white-space: nowrap;">
